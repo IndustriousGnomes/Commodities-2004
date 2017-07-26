@@ -1,0 +1,46 @@
+<project name="Commodities" default="compile" basedir=".">
+    <description>
+        Commodity build file
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="src/commodities"/>
+    <property name="srcDev" location="srcDev/commodities"/>
+
+    <property name="build" location="exec"/>
+
+    <!-- Create the time stamp -->
+    <tstamp/>
+
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+
+    <target name="compile"
+            description="compile the source for Commodities" >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}"/>
+    </target>
+
+    <target name="compileDev"
+            description="compile the source for Commodities" >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build}"/>
+        <javac srcdir="${srcDev}" destdir="${build}"/>
+    </target>
+
+    <target name="execute"
+            description="Executes the program Commodities" >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <java classname="commodities.CommodityAnalyzer">
+            <jvmarg value="-Xms400m"/>
+            <jvmarg value="-Xmx400m"/>
+        </java>
+    </target>
+
+    <target name="clean"
+            description="clean up" >
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+    </target>
+</project>
+

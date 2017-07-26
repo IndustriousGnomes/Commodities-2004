@@ -1,0 +1,150 @@
+package id40sm2czp1oohpczpkccu9;
+
+/**
+@version 2.0
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node32:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference72 {
+}/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node18:oiref><oihard>
+@__modelType reference 
+*/
+class reference75 {
+}/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node24:oiref><oihard>
+@__modelType reference 
+*/
+class reference76 {
+}/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node22:oiref><oihard>
+@__modelType reference 
+*/
+class reference78 {
+}/**
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node79:oiref><oihard>
+@__modelType reference 
+*/
+class reference80 {
+}}/**
+This diagram shows the optimization of the test suite for each commodity.  This process is run periodically (monthly or longer) or on demand.
+@__tags
+@shapeType UseCaseDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions <oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node:oiref>=20,168,81,77,1:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node79.link:oiref>=88,108,170,108:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node32.link:oiref>=93,307,158,284:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node18.link:oiref>=270,294,270,355:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node32:oiref>=28,294,65,77,1:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node22.link:oiref>=247,137,247,249:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node24:oiref>=216,355,215,45,1:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node32.link77:oiref>=93,361,216,365:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node18:oiref>=158,249,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node79:oiref>=26,48,62,77,1:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node.link:oiref>=101,230,158,259:oigroup>
+<oigroup:<oiref:design#Class#id40sm2czp1oohpczpkccu9.node22:oiref>=170,92,166,45,1:oigroup>
+ 
+*/
+class __positions {
+}/**
+The speculator is the person(s) that is using this tool to analyze the commodities market and makes investment decisions on the data/recommendations obtained.
+@shapeType Actor
+@__modelType node
+@name Speculator*/
+class node32 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node18:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node24:oiref><oihard> 
+*/
+class link77 {
+}}/**
+@shapeType Actor
+@__modelType node
+@name System Clock 
+*/
+class node {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node18:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Optimize Test Suite 
+@preconditions 1. Raw data for commodities has been entered into the system.
+2. Tests have been identified to the system.
+@postconditions 1. A test suite customized for an individual commodity.
+@normalFlow 1. Speculator chooses to optimize the test suite from a menu option or an automated periodic time initiates the optimization process.
+2. All available tests are executed against the raw data of the commodities using the trading simulator on each individual test.
+3. Those tests that perform well (parameter driven) are retained for the optimized test suite.
+*/
+class node18 {
+/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node24:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Execute Trading Simulator 
+@preconditions 1. Raw data has been entered into the system.
+2. A test or test suite has been identified.
+3. A commodity to run the simulator on has been identified.
+@postconditions 1. Evaluation of the test or test suite on a commodity in the form of percentage change.
+@normalFlow 1. Trading simulator is started with a test/test suite and a commidity to test with.
+2. Simulator is executed against all available data for the commodity.
+3. A percentage change in value is used as the returned results.
+*/
+class node24 {
+}/**
+Tests will be added to a particular package that will be dynamically loaded by the system.  In this fassion, each test simply needs to follow an interface and can be added without modification to the existing code when a new test is desired.
+@shapeType UseCase
+@__modelType node
+@name Maintain Test List 
+*/
+class node22 {
+/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node18:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType Actor
+@__modelType node
+@name Developer 
+*/
+class node79 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id40sm2czp1oohpczpkccu9.node22:oiref><oihard> 
+*/
+class link {
+}}

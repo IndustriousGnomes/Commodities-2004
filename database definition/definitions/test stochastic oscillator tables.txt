@@ -1,0 +1,87 @@
+USE commodities;
+
+DROP TABLE IF EXISTS test_stochastic_oscillator;
+#DROP TABLE IF EXISTS test_stochastic_kd;
+#DROP TABLE IF EXISTS test_stochastic_kd_exponential;
+#DROP TABLE IF EXISTS test_stochastic_kd_triangle;
+
+CREATE TABLE IF NOT EXISTS test_stochastic_oscillator
+    (id                 INT             NOT NULL        COMMENT '',
+     commodity_id       VARCHAR(4)      NOT NULL        COMMENT 'The ID of the commodity',
+     contract_month     VARCHAR(10)     NOT NULL        COMMENT 'The contract month this test is for',
+     k_periods          INT             NOT NULL        COMMENT '',
+     k_slowing_periods  INT             NOT NULL        COMMENT '',
+     percent_line       INT             NOT NULL        COMMENT '',
+     test_interval      INT             NOT NULL        COMMENT 'The interval to use for short/medium/long term tests',
+     success_ratio      DECIMAL(18,16)  NOT NULL        COMMENT 'The ratio of win/total trades',
+     profit_loss        DECIMAL(18,2)   NOT NULL        COMMENT '',
+     profit_count       INT             NOT NULL        COMMENT 'Number of profitable trades',
+     profit_total       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total profitable trades.',
+     loss_count         INT             NOT NULL        COMMENT 'Number of loss trades',
+     loss_total         DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total loss trades.',
+     largest_profit     DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest profit for a single transaction.',
+     largest_loss       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest loss for a single transaction.',
+     KEY (id),
+     KEY (success_ratio)
+    );
+
+CREATE TABLE IF NOT EXISTS test_stochastic_kd
+    (id                 INT             NOT NULL        COMMENT '',
+     commodity_id       VARCHAR(4)      NOT NULL        COMMENT 'The ID of the commodity',
+     contract_month     VARCHAR(10)     NOT NULL        COMMENT 'The contract month this test is for',
+     k_periods          INT             NOT NULL        COMMENT '',
+     k_slowing_periods  INT             NOT NULL        COMMENT '',
+     d_periods          INT             NOT NULL        COMMENT '',
+     test_interval      INT             NOT NULL        COMMENT 'The interval to use for short/medium/long term tests',
+     success_ratio      DECIMAL(18,16)  NOT NULL        COMMENT 'The ratio of win/total trades',
+     profit_loss        DECIMAL(18,2)   NOT NULL        COMMENT '',
+     profit_count       INT             NOT NULL        COMMENT 'Number of profitable trades',
+     profit_total       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total profitable trades.',
+     loss_count         INT             NOT NULL        COMMENT 'Number of loss trades',
+     loss_total         DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total loss trades.',
+     largest_profit     DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest profit for a single transaction.',
+     largest_loss       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest loss for a single transaction.',
+     KEY (id),
+     KEY (success_ratio)
+    );
+
+CREATE TABLE IF NOT EXISTS test_stochastic_kd_exponential
+    (id                 INT             NOT NULL        COMMENT '',
+     commodity_id       VARCHAR(4)      NOT NULL        COMMENT 'The ID of the commodity',
+     contract_month     VARCHAR(10)     NOT NULL        COMMENT 'The contract month this test is for',
+     k_periods          INT             NOT NULL        COMMENT '',
+     k_slowing_periods  INT             NOT NULL        COMMENT '',
+     d_percent          INT             NOT NULL        COMMENT '',
+     test_interval      INT             NOT NULL        COMMENT 'The interval to use for short/medium/long term tests',
+     success_ratio      DECIMAL(18,16)  NOT NULL        COMMENT 'The ratio of win/total trades',
+     profit_loss        DECIMAL(18,2)   NOT NULL        COMMENT '',
+     profit_count       INT             NOT NULL        COMMENT 'Number of profitable trades',
+     profit_total       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total profitable trades.',
+     loss_count         INT             NOT NULL        COMMENT 'Number of loss trades',
+     loss_total         DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total loss trades.',
+     largest_profit     DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest profit for a single transaction.',
+     largest_loss       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest loss for a single transaction.',
+     KEY (id),
+     KEY (success_ratio)
+    );
+
+CREATE TABLE IF NOT EXISTS test_stochastic_kd_triangle
+    (id                 INT             NOT NULL        COMMENT '',
+     commodity_id       VARCHAR(4)      NOT NULL        COMMENT 'The ID of the commodity',
+     contract_month     VARCHAR(10)     NOT NULL        COMMENT 'The contract month this test is for',
+     k_periods          INT             NOT NULL        COMMENT '',
+     k_slowing_periods  INT             NOT NULL        COMMENT '',
+     d_periods          INT             NOT NULL        COMMENT '',
+     test_interval      INT             NOT NULL        COMMENT 'The interval to use for short/medium/long term tests',
+     success_ratio      DECIMAL(18,16)  NOT NULL        COMMENT 'The ratio of win/total trades',
+     profit_loss        DECIMAL(18,2)   NOT NULL        COMMENT '',
+     profit_count       INT             NOT NULL        COMMENT 'Number of profitable trades',
+     profit_total       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total profitable trades.',
+     loss_count         INT             NOT NULL        COMMENT 'Number of loss trades',
+     loss_total         DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the total loss trades.',
+     largest_profit     DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest profit for a single transaction.',
+     largest_loss       DECIMAL(18,2)   NOT NULL        COMMENT 'Amount of the largest loss for a single transaction.',
+     KEY (id),
+     KEY (success_ratio)
+    );
+

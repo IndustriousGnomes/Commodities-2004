@@ -1,0 +1,221 @@
+package id191aaczp1oohpczpil3nj;
+
+/**
+@version 2.0
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node32:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node52:oiref><oihard>
+@__modelType reference 
+*/
+class reference54 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node2:oiref><oihard>
+@__modelType reference 
+*/
+class reference59 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node16:oiref><oihard>
+@__modelType reference 
+*/
+class reference60 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference62 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node63:oiref><oihard>
+@__modelType reference 
+*/
+class reference64 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node20:oiref><oihard>
+@__modelType reference 
+*/
+class reference66 {
+}/**
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node14:oiref><oihard>
+@__modelType reference 
+*/
+class reference69 {
+}}/**
+This diagram shows the daily test use cases to perform analysis on the raw commodity information and make recommendations.
+@__tags
+@shapeType UseCaseDiagram 
+*/
+class __tags {
+}/**
+@__options option.orientation = Landscape 
+*/
+class __options {
+}/**
+@__positions 
+
+
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node63:oiref>=616,517,235,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node52:oiref>=310,22,52,77,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node16.link:oiref>=575,461,632,418:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node16:oiref>=402,451,173,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node2:oiref>=204,210,171,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node32.link61:oiref>=47,390,459,451:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node2.link:oiref>=332,255,517,451:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node16.link65:oiref>=575,486,616,527:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node52.link:oiref>=336,99,336,210:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node32.link:oiref>=58,313,246,255:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node:oiref>=632,383,177,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node20:oiref>=143,328,232,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node32:oiref>=15,313,65,77,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node14:oiref>=65,122,217,45,1:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node2.link71:oiref>=230,210,230,167:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node2.link68:oiref>=289,255,289,328:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node32.link70:oiref>=36,313,147,167:oigroup>
+<oigroup:<oiref:design#Class#id191aaczp1oohpczpil3nj.node32.link67:oiref>=80,343,143,343:oigroup>
+
+
+
+*/
+class __positions {
+}/**
+The speculator is the person(s) that is using this tool to analyze the commodities market and makes investment decisions on the data/recommendations obtained.
+@shapeType Actor
+@__modelType node
+@name Speculator*/
+class node32 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node2:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node16:oiref><oihard> 
+*/
+class link61 {
+}/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node20:oiref><oihard> 
+*/
+class link67 {
+}/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node14:oiref><oihard> 
+*/
+class link70 {
+}}/**
+A source of pricing and statistical information.
+@shapeType Actor
+@__modelType node
+@name Internet 
+*/
+class node52 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node2:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Maintain Daily Inputs 
+@preconditions 1. Data must be collected from input sources (news papers, internet, etc)
+@postconditions 1. Raw data available for market analysis.
+@normalFlow 1. On a regular basis (timed or manual input), enter raw data into the system.
+2. Perform analysis of data for future recommendations using the optimized test suite (if it is available).
+*/
+class node2 {
+/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node16:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node20:oiref><oihard> 
+*/
+class link68 {
+}/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node14:oiref><oihard> 
+*/
+class link71 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Display Test Results 
+@preconditions 1. The optimized test suite has been identified.
+2. Tests have been performed on the raw data.
+@postconditions 1. Display of information.
+@normalFlow 1. Speculator selects a commodity or group of commodities to see the testing results on.
+2. Selects a show test results option from a menu.
+3. Display the individual test results for each test on the current day for the selected commodities.
+*/
+class node16 {
+/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id191aaczp1oohpczpil3nj.node63:oiref><oihard> 
+*/
+class link65 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Display Test Analysis
+@preconditions 1. Tests have been performed on the raw data.
+@normalFlow 1. From displaying all of the test results, a test for a given commodity is selected.
+2. Display the information that lead to the conclusion of the test.  This may be graphically or statistically displayed based on the test.
+@postconditions 1. Display of information. 
+*/
+class node {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Display historical test results
+@preconditions 1. Tests have been performed on raw data.
+@postconditions 1. Display of information.
+@normalFlow 1. By selecting a control to move backwards (and forwards) through time, display the appropriate test results.
+2. If a test is being displayed in detail, these should be updated as well. 
+*/
+class node63 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Request Recommendations 
+@preconditions 1. An optimized test suite has been identified for the commodity.
+2. Tests have been performed on the raw data.
+@postconditions 1. Make a recommendation to the Speculator based on technical data.
+@normalFlow 1. Speculator requests recommendation on a commodity or group of commodities.
+2. Test results from the optimized test suite are accumulated for buy/sell signals.
+3. A recommendation and confidence level is constructed and returned to the Speculator.
+*/
+class node20 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Display Commodity Prices 
+@preconditions 1. Raw data has been entered for the commodities.
+@postconditions 1. Display information
+@normalFlow 1. Speculator requests raw data to be displayed for the selected commodity(s).
+*/
+class node14 {
+}

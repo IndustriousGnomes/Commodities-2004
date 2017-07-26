@@ -1,0 +1,43 @@
+javadoc                                                                        ^
+-private                                                                       ^
+-linksource                                                                    ^
+-tag todo:a:"To Do:"                                                           ^
+-tag update:a:"Updated:"                                                       ^
+-author                                                                        ^
+-version                                                                       ^
+-use                                                                           ^
+-splitindex                                                                    ^
+-overview .\overview.html                                                      ^
+-doctitle "Commodity Analyzer<br>API Specification"                            ^
+-windowtitle "Commodity Analyzer API Specification"                            ^
+-header "Commodity Analyzer"                                                   ^
+-footer "Commodity Analyzer"                                                   ^
+-bottom "Copyright 2004 J.R. Titko.  All rights reserved."                     ^
+-link http://java.sun.com/j2se/1.5.0/docs/api                                  ^
+-link C:\JavaProjects\Utilities\docs\api                                       ^
+-sourcepath .\src;C:\java\j2sdk1.4.2_03\src.zip;C:\JavaProjects\Utilities\src  ^
+-subpackages commodities                                                       ^
+-d .\docs\api                                                                  ^
+-quiet                                                                         ^
+-J-Xmx128m
+
+javadoc                                                                        ^
+-private                                                                       ^
+-linksource                                                                    ^
+-tag todo:a:"To Do:"                                                           ^
+-author                                                                        ^
+-version                                                                       ^
+-use                                                                           ^
+-splitindex                                                                    ^
+-overview .\overview.html                                                      ^
+-doctitle "Commodity Analyzer Prototype<br>API Specification"                  ^
+-windowtitle "Commodity Analyzer Prototype API Specification"                  ^
+-header "Commodity Analyzer Prototype"                                         ^
+-footer "Commodity Analyzer Prototype"                                         ^
+-bottom "Copyright 2004 J.R. Titko.  All rights reserved."                     ^
+-link http://java.sun.com/j2se/1.5.0/docs/api                                  ^
+-link C:\JavaProjects\Utilities\docs\api                                       ^
+-sourcepath .\src;C:\java\j2sdk1.4.2_03\src.zip                                ^
+-subpackages prototype                                                         ^
+-d .\docs\api                                                                  ^
+-J-Xmx128m

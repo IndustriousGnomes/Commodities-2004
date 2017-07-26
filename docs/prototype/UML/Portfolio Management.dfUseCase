@@ -1,0 +1,244 @@
+package id3bsupczp1oohpczp3993c;
+
+/**
+@version 2.0
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node32:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node4:oiref><oihard>
+@__modelType reference 
+*/
+class reference45 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node6:oiref><oihard>
+@__modelType reference 
+*/
+class reference46 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node8:oiref><oihard>
+@__modelType reference 
+*/
+class reference47 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node10:oiref><oihard>
+@__modelType reference 
+*/
+class reference49 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node12:oiref><oihard>
+@__modelType reference 
+*/
+class reference50 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference7 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node9:oiref><oihard>
+@__modelType reference 
+*/
+class reference10 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node11:oiref><oihard>
+@__modelType reference 
+*/
+class reference12 {
+}/**
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node13:oiref><oihard>
+@__modelType reference 
+*/
+class reference14 {
+}}/**
+This diagram covers the management of portfolios from their creation to their periodic use.
+@__tags
+@shapeType UseCaseDiagram 
+*/
+class __tags {
+}/**
+@__options option.printzoom = 0.6 
+*/
+class __options {
+}/**
+@__positions <oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node8.link:oiref>=540,260,587,219:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node8.link51:oiref>=457,295,457,388:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node9:oiref>=838,184,191,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node4:oiref>=153,180,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node32:oiref>=39,226,65,77,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node12:oiref>=364,388,208,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node10:oiref>=587,184,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node13:oiref>=796,293,226,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node10.link15:oiref>=733,184,733,123:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node10.link18:oiref>=718,229,718,364:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node10.link16:oiref>=753,206,838,206:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node:oiref>=713,78,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node32.link48:oiref>=104,290,162,330:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node6.link:oiref>=328,330,374,285:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node8:oiref>=374,250,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node6:oiref>=162,320,166,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node4.link:oiref>=319,215,374,260:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node11:oiref>=684,364,185,45,1:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node32.link:oiref>=104,239,153,215:oigroup>
+<oigroup:<oiref:design#Class#id3bsupczp1oohpczp3993c.node10.link17:oiref>=735,229,909,293:oigroup>
+*/
+class __positions {
+}/**
+The speculator is the person(s) that is using this tool to analyze the commodities market and makes investment decisions on the data/recommendations obtained.
+@shapeType Actor
+@__modelType node
+@name Speculator*/
+class node32 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node4:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node6:oiref><oihard> 
+*/
+class link48 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Create Portfolio 
+@preconditions 1. An account must be set up with a broker.
+@postconditions 1. A portfolio account for a given speculator.
+@normalFlow 1. Select the creation of a new portfolio from a menu.
+2. Enter portfolio information such as speculator's name and relavent information, information about the preferred broker(?), and the initial investment amount.
+3. Validate and save the information.
+*/
+class node4 {
+/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node8:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Load Portfolio 
+@normalFlow 1. Select the loading of a portfolio from a menu.
+2. Select the speculator to load the information for.
+@preconditions 1. Portfolio must have been created for this speculator.
+@postconditions 1. Portfolio loaded into memory for analysis.
+*/
+class node6 {
+/**
+@shapeType ExtendsLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node8:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Maintain Portfolio 
+@normalFlow Choose:
+1. Maintain the current state of orders.
+2. Adjust investment capital for transactions that are not order specific (maintenance fees, deposit/withdrawl of funds, etc)
+@preconditions 1. Portfolio has been loaded for a Speculator.
+@postconditions 1. An up to date list of current orders and what their current state is.*/
+class node8 {
+/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node10:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node12:oiref><oihard> 
+*/
+class link51 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Maintain Orders 
+@preconditions 1. Portfolio must be loaded for the Speculator.
+@postconditions 1. An up to date list of the current orders and what state they are currently in.
+@abstract*/
+class node10 {
+/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node:oiref><oihard> 
+*/
+class link15 {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node9:oiref><oihard> 
+*/
+class link16 {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node13:oiref><oihard> 
+*/
+class link17 {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id3bsupczp1oohpczp3993c.node11:oiref><oihard> 
+*/
+class link18 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Adjust Investment Capital 
+@preconditions 1. Portfolio must be loaded for the Speculator.
+@postconditions 1. Investment capital reflects that of the account with the broker.
+@normalFlow 1. Select a capital investment adjustment option from the menu.
+2. Enter the adjustment amount (+/-).
+3. Enter a description of why the adjustment is being entered.
+4. Validate and confirm adjustment.
+*/
+class node12 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Add a buy/sell order
+@normalFlow 1. Speculator enters commodity order information (price, stop, etc).
+2. Speculator manually calls the broker and places the order. 
+*/
+class node {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Update a buy/sell order
+@preconditions 1. An order must have been added.
+@normalFlow 1. Speculator updates commodity order information (price, stop, etc).
+2. Speculator manually calls the broker and changes the order. 
+*/
+class node9 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Delete a buy/sell order
+@preconditions 1. Order has been placed with the broker but not fulfilled.
+@normalFlow 1. Speculator manually calls the broker and cancels the order.
+2. Broker calls back that the order was canceled.
+3. Speculator deletes the order. 
+*/
+class node11 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Add a sell/buy counter order
+@preconditions 1. An order must have been fulfilled by the broker.
+@normalFlow 1. Speculator enters commodity order information (price, stop, etc).
+2. Speculator manually calls the broker and places the counter order. 
+*/
+class node13 {
+}

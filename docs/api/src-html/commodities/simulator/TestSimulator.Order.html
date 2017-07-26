@@ -1,0 +1,338 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /* _ Review Javadocs */<a name="line.1"></a>
+<FONT color="green">002</FONT>    package commodities.simulator;<a name="line.2"></a>
+<FONT color="green">003</FONT>    <a name="line.3"></a>
+<FONT color="green">004</FONT>    import commodities.commodity.*;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import commodities.contract.*;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import commodities.tests.*;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import commodities.tests.technical.*;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import commodities.util.*;<a name="line.8"></a>
+<FONT color="green">009</FONT>    <a name="line.9"></a>
+<FONT color="green">010</FONT>    import java.util.*;<a name="line.10"></a>
+<FONT color="green">011</FONT>    <a name="line.11"></a>
+<FONT color="green">012</FONT>    /**<a name="line.12"></a>
+<FONT color="green">013</FONT>     *  The TestSimulator simulates the daily actions of the commodity<a name="line.13"></a>
+<FONT color="green">014</FONT>     *  program user for a specific test.  It makes decisions on buying and<a name="line.14"></a>
+<FONT color="green">015</FONT>     *  selling contracts based on the analysis done within the commodities program.<a name="line.15"></a>
+<FONT color="green">016</FONT>     *<a name="line.16"></a>
+<FONT color="green">017</FONT>     *  An exception to the daily actions is that all orders are automatically<a name="line.17"></a>
+<FONT color="green">018</FONT>     *  filled on the next day's opening value unless a stop loss was enacted.<a name="line.18"></a>
+<FONT color="green">019</FONT>     *  A stop loss will be sold at the stoploss price if that day's prices span the<a name="line.19"></a>
+<FONT color="green">020</FONT>     *  stop loss amount.  Otherwise, the open price of the next day will be the stop loss<a name="line.20"></a>
+<FONT color="green">021</FONT>     *  out price.  Stop loss prices are set by the test.  Tests that do not supply stop<a name="line.21"></a>
+<FONT color="green">022</FONT>     *  loss prices will not have contracts sold based on stop loss amounts.<a name="line.22"></a>
+<FONT color="green">023</FONT>     *  At the end of the simulator run, all open orders are resolved on the<a name="line.23"></a>
+<FONT color="green">024</FONT>     *  closing price of the last day.<a name="line.24"></a>
+<FONT color="green">025</FONT>     *<a name="line.25"></a>
+<FONT color="green">026</FONT>     *  TEST OPTIMIZATION<a name="line.26"></a>
+<FONT color="green">027</FONT>     *  -----------------<a name="line.27"></a>
+<FONT color="green">028</FONT>     *  A technical test will start the simulator for its test only.  The simulator<a name="line.28"></a>
+<FONT color="green">029</FONT>     *  will start from the first day of data available for the commodity that the<a name="line.29"></a>
+<FONT color="green">030</FONT>     *  test is being optimized for.  The simulator will advance the date one day<a name="line.30"></a>
+<FONT color="green">031</FONT>     *  at a time (skipping weekends) until the current date.<a name="line.31"></a>
+<FONT color="green">032</FONT>     *<a name="line.32"></a>
+<FONT color="green">033</FONT>     *  @author     J.R. Titko<a name="line.33"></a>
+<FONT color="green">034</FONT>     *  @since      1.00<a name="line.34"></a>
+<FONT color="green">035</FONT>     *  @version    1.00<a name="line.35"></a>
+<FONT color="green">036</FONT>     */<a name="line.36"></a>
+<FONT color="green">037</FONT>    <a name="line.37"></a>
+<FONT color="green">038</FONT>    public class TestSimulator {<a name="line.38"></a>
+<FONT color="green">039</FONT>    /* *************************************** */<a name="line.39"></a>
+<FONT color="green">040</FONT>    /* *** CLASS VARIABLES                 *** */<a name="line.40"></a>
+<FONT color="green">041</FONT>    /* *************************************** */<a name="line.41"></a>
+<FONT color="green">042</FONT>    <a name="line.42"></a>
+<FONT color="green">043</FONT>    <a name="line.43"></a>
+<FONT color="green">044</FONT>    /* *************************************** */<a name="line.44"></a>
+<FONT color="green">045</FONT>    /* *** INSTANCE VARIABLES              *** */<a name="line.45"></a>
+<FONT color="green">046</FONT>    /* *************************************** */<a name="line.46"></a>
+<FONT color="green">047</FONT>        /** Map of open orders */<a name="line.47"></a>
+<FONT color="green">048</FONT>        private Map openOrders = new HashMap();<a name="line.48"></a>
+<FONT color="green">049</FONT>        /** The last processing day of the simulation. */<a name="line.49"></a>
+<FONT color="green">050</FONT>        java.util.Date lastDate;<a name="line.50"></a>
+<FONT color="green">051</FONT>        /** The last date of processing for this test. */<a name="line.51"></a>
+<FONT color="green">052</FONT>        private java.util.Date wrapupDate;<a name="line.52"></a>
+<FONT color="green">053</FONT>    <a name="line.53"></a>
+<FONT color="green">054</FONT>        /** The contract to run the test over. */<a name="line.54"></a>
+<FONT color="green">055</FONT>        private Contract contract;<a name="line.55"></a>
+<FONT color="green">056</FONT>        /** The test to be processed. */<a name="line.56"></a>
+<FONT color="green">057</FONT>        private TechnicalTestInterface test;<a name="line.57"></a>
+<FONT color="green">058</FONT>        /** The statistical data to process for the test. */<a name="line.58"></a>
+<FONT color="green">059</FONT>        private StatsAbstract stats;<a name="line.59"></a>
+<FONT color="green">060</FONT>    <a name="line.60"></a>
+<FONT color="green">061</FONT>    /* *************************************** */<a name="line.61"></a>
+<FONT color="green">062</FONT>    /* *** INNER CLASSES                   *** */<a name="line.62"></a>
+<FONT color="green">063</FONT>    /* *************************************** */<a name="line.63"></a>
+<FONT color="green">064</FONT>        /**<a name="line.64"></a>
+<FONT color="green">065</FONT>         *  The Order class holds a single order.<a name="line.65"></a>
+<FONT color="green">066</FONT>         */<a name="line.66"></a>
+<FONT color="green">067</FONT>        private class Order {<a name="line.67"></a>
+<FONT color="green">068</FONT>        /* *************************************** */<a name="line.68"></a>
+<FONT color="green">069</FONT>        /* *** INSTANCE VARIABLES              *** */<a name="line.69"></a>
+<FONT color="green">070</FONT>        /* *************************************** */<a name="line.70"></a>
+<FONT color="green">071</FONT>            /** A buy order(true) or a sell order(false) */<a name="line.71"></a>
+<FONT color="green">072</FONT>            private boolean isBuy;<a name="line.72"></a>
+<FONT color="green">073</FONT>            /** Date the order was placed */<a name="line.73"></a>
+<FONT color="green">074</FONT>            private java.util.Date date;<a name="line.74"></a>
+<FONT color="green">075</FONT>            /** Actual price the order was entered. */<a name="line.75"></a>
+<FONT color="green">076</FONT>            private double price;<a name="line.76"></a>
+<FONT color="green">077</FONT>    <a name="line.77"></a>
+<FONT color="green">078</FONT>        /* *************************************** */<a name="line.78"></a>
+<FONT color="green">079</FONT>        /* *** CONSTRUCTORS                    *** */<a name="line.79"></a>
+<FONT color="green">080</FONT>        /* *************************************** */<a name="line.80"></a>
+<FONT color="green">081</FONT>            /**<a name="line.81"></a>
+<FONT color="green">082</FONT>             *  Create an order.  Orders can be buy or sell, have the date<a name="line.82"></a>
+<FONT color="green">083</FONT>             *  the order was filled, and the price it was filled at.<a name="line.83"></a>
+<FONT color="green">084</FONT>             */<a name="line.84"></a>
+<FONT color="green">085</FONT>            public Order(boolean isBuy, java.util.Date date, double price) {<a name="line.85"></a>
+<FONT color="green">086</FONT>                this.isBuy = isBuy;<a name="line.86"></a>
+<FONT color="green">087</FONT>                this.date  = date;<a name="line.87"></a>
+<FONT color="green">088</FONT>                this.price = price;<a name="line.88"></a>
+<FONT color="green">089</FONT>            }<a name="line.89"></a>
+<FONT color="green">090</FONT>    <a name="line.90"></a>
+<FONT color="green">091</FONT>        /* *************************************** */<a name="line.91"></a>
+<FONT color="green">092</FONT>        /* *** GET & SET METHODS               *** */<a name="line.92"></a>
+<FONT color="green">093</FONT>        /* *************************************** */<a name="line.93"></a>
+<FONT color="green">094</FONT>            /**<a name="line.94"></a>
+<FONT color="green">095</FONT>             *  Returns if this is a buy order, otherwise it is a sell order.<a name="line.95"></a>
+<FONT color="green">096</FONT>             *  @return     true if the order is a buy order<a name="line.96"></a>
+<FONT color="green">097</FONT>             */<a name="line.97"></a>
+<FONT color="green">098</FONT>            public boolean isBuy() { return isBuy; }<a name="line.98"></a>
+<FONT color="green">099</FONT>            /**<a name="line.99"></a>
+<FONT color="green">100</FONT>             *  Gets the date.<a name="line.100"></a>
+<FONT color="green">101</FONT>             *  @return     the date<a name="line.101"></a>
+<FONT color="green">102</FONT>             */<a name="line.102"></a>
+<FONT color="green">103</FONT>            public java.util.Date getDate() { return date; }<a name="line.103"></a>
+<FONT color="green">104</FONT>            /**<a name="line.104"></a>
+<FONT color="green">105</FONT>             *  Gets the price.<a name="line.105"></a>
+<FONT color="green">106</FONT>             *  @return     the price<a name="line.106"></a>
+<FONT color="green">107</FONT>             */<a name="line.107"></a>
+<FONT color="green">108</FONT>            public double getPrice() { return price; }<a name="line.108"></a>
+<FONT color="green">109</FONT>        }<a name="line.109"></a>
+<FONT color="green">110</FONT>    <a name="line.110"></a>
+<FONT color="green">111</FONT>    /* *************************************** */<a name="line.111"></a>
+<FONT color="green">112</FONT>    /* *** CONSTRUCTORS                    *** */<a name="line.112"></a>
+<FONT color="green">113</FONT>    /* *************************************** */<a name="line.113"></a>
+<FONT color="green">114</FONT>        /**<a name="line.114"></a>
+<FONT color="green">115</FONT>         *  This constructor will perform a simmulated run using only<a name="line.115"></a>
+<FONT color="green">116</FONT>         *  the one technical test requested.  The length of the simulated<a name="line.116"></a>
+<FONT color="green">117</FONT>         *  run will be over the range of all available data.<a name="line.117"></a>
+<FONT color="green">118</FONT>         *<a name="line.118"></a>
+<FONT color="green">119</FONT>         *  @param  contract    The contract to run the test over.<a name="line.119"></a>
+<FONT color="green">120</FONT>         *  @param  test        The test to be processed.<a name="line.120"></a>
+<FONT color="green">121</FONT>         *  @param  stats       The statistical data to process for the test.<a name="line.121"></a>
+<FONT color="green">122</FONT>         */<a name="line.122"></a>
+<FONT color="green">123</FONT>        public TestSimulator(Contract contract,<a name="line.123"></a>
+<FONT color="green">124</FONT>                             TechnicalTestInterface test,<a name="line.124"></a>
+<FONT color="green">125</FONT>                             StatsAbstract stats) {<a name="line.125"></a>
+<FONT color="green">126</FONT>            this(contract, test, stats, ((CommodityCalendar)CommodityCalendar.getInstance()).getTime());<a name="line.126"></a>
+<FONT color="green">127</FONT>        }<a name="line.127"></a>
+<FONT color="green">128</FONT>    <a name="line.128"></a>
+<FONT color="green">129</FONT>        /**<a name="line.129"></a>
+<FONT color="green">130</FONT>         *  This constructor will perform a simmulated run using only<a name="line.130"></a>
+<FONT color="green">131</FONT>         *  the one technical test requested.  The length of the simulated<a name="line.131"></a>
+<FONT color="green">132</FONT>         *  run will be over the range from the start of the data to the given<a name="line.132"></a>
+<FONT color="green">133</FONT>         *  last date.<a name="line.133"></a>
+<FONT color="green">134</FONT>         *<a name="line.134"></a>
+<FONT color="green">135</FONT>         *  @param  contract    The contract to run the test over.<a name="line.135"></a>
+<FONT color="green">136</FONT>         *  @param  test        The test to be processed.<a name="line.136"></a>
+<FONT color="green">137</FONT>         *  @param  stats       The statistical data to process for the test.<a name="line.137"></a>
+<FONT color="green">138</FONT>         */<a name="line.138"></a>
+<FONT color="green">139</FONT>        public TestSimulator(Contract contract,<a name="line.139"></a>
+<FONT color="green">140</FONT>                            TechnicalTestInterface test,<a name="line.140"></a>
+<FONT color="green">141</FONT>                            StatsAbstract stats,<a name="line.141"></a>
+<FONT color="green">142</FONT>                            java.util.Date lastDate) {<a name="line.142"></a>
+<FONT color="green">143</FONT>            this.contract   = contract;<a name="line.143"></a>
+<FONT color="green">144</FONT>            this.test       = test;<a name="line.144"></a>
+<FONT color="green">145</FONT>            this.stats      = stats;<a name="line.145"></a>
+<FONT color="green">146</FONT>            this.lastDate   = lastDate;<a name="line.146"></a>
+<FONT color="green">147</FONT>    <a name="line.147"></a>
+<FONT color="green">148</FONT>            dailyProcessing();<a name="line.148"></a>
+<FONT color="green">149</FONT>            wrapUpProcessing();     // last trading day<a name="line.149"></a>
+<FONT color="green">150</FONT>        }<a name="line.150"></a>
+<FONT color="green">151</FONT>    <a name="line.151"></a>
+<FONT color="green">152</FONT>    /* *************************************** */<a name="line.152"></a>
+<FONT color="green">153</FONT>    /* *** GET & SET METHODS               *** */<a name="line.153"></a>
+<FONT color="green">154</FONT>    /* *************************************** */<a name="line.154"></a>
+<FONT color="green">155</FONT>    <a name="line.155"></a>
+<FONT color="green">156</FONT>    <a name="line.156"></a>
+<FONT color="green">157</FONT>    /* *************************************** */<a name="line.157"></a>
+<FONT color="green">158</FONT>    /* *** INSTANCE METHODS                *** */<a name="line.158"></a>
+<FONT color="green">159</FONT>    /* *************************************** */<a name="line.159"></a>
+<FONT color="green">160</FONT>        /**<a name="line.160"></a>
+<FONT color="green">161</FONT>         *  This method simulates the users processes that goes on in a daily<a name="line.161"></a>
+<FONT color="green">162</FONT>         *  trading situation using only a single technical test.<a name="line.162"></a>
+<FONT color="green">163</FONT>         *<a name="line.163"></a>
+<FONT color="green">164</FONT>         *  @param  &lt;param>             &lt;param description><a name="line.164"></a>
+<FONT color="green">165</FONT>         *  @throws &lt;exception type>    &lt;exception description><a name="line.165"></a>
+<FONT color="green">166</FONT>         *  @return                     &lt;description of return value><a name="line.166"></a>
+<FONT color="green">167</FONT>         */<a name="line.167"></a>
+<FONT color="green">168</FONT>        private void dailyProcessing() {<a name="line.168"></a>
+<FONT color="green">169</FONT>            ListIterator dateIterator = contract.getPriceDates(Contract.ASCENDING);<a name="line.169"></a>
+<FONT color="green">170</FONT>            while (dateIterator.hasNext()) {<a name="line.170"></a>
+<FONT color="green">171</FONT>                java.util.Date date = (java.util.Date)dateIterator.next();<a name="line.171"></a>
+<FONT color="green">172</FONT>                if (date.after(lastDate)) {<a name="line.172"></a>
+<FONT color="green">173</FONT>                    return;<a name="line.173"></a>
+<FONT color="green">174</FONT>                } else {<a name="line.174"></a>
+<FONT color="green">175</FONT>                    wrapupDate = date;<a name="line.175"></a>
+<FONT color="green">176</FONT>                }<a name="line.176"></a>
+<FONT color="green">177</FONT>    <a name="line.177"></a>
+<FONT color="green">178</FONT>                int buySellRec = test.makeBuySellRecommendation(date, stats);<a name="line.178"></a>
+<FONT color="green">179</FONT>                if (buySellRec != Recommendation.NO_ACTION) {<a name="line.179"></a>
+<FONT color="green">180</FONT>                    java.util.Date purchaseDate = null;<a name="line.180"></a>
+<FONT color="green">181</FONT>                    double purchasePrice = 0;<a name="line.181"></a>
+<FONT color="green">182</FONT>                    if (dateIterator.hasNext()) {<a name="line.182"></a>
+<FONT color="green">183</FONT>                        purchaseDate = (java.util.Date)dateIterator.next();<a name="line.183"></a>
+<FONT color="green">184</FONT>                        purchasePrice = contract.getPrices(purchaseDate).getOpen();<a name="line.184"></a>
+<FONT color="green">185</FONT>                        dateIterator.previous();<a name="line.185"></a>
+<FONT color="green">186</FONT>                    } else {<a name="line.186"></a>
+<FONT color="green">187</FONT>                        purchaseDate = date;<a name="line.187"></a>
+<FONT color="green">188</FONT>                        purchasePrice = contract.getPrices(purchaseDate).getClose();<a name="line.188"></a>
+<FONT color="green">189</FONT>                    }<a name="line.189"></a>
+<FONT color="green">190</FONT>    <a name="line.190"></a>
+<FONT color="green">191</FONT>                    if (purchasePrice == 0.0) {<a name="line.191"></a>
+<FONT color="green">192</FONT>                        purchasePrice = ((contract.getPrices(purchaseDate).getHigh() + contract.getPrices(purchaseDate).getLow()) / 2.0);<a name="line.192"></a>
+<FONT color="green">193</FONT>                    }<a name="line.193"></a>
+<FONT color="green">194</FONT>    <a name="line.194"></a>
+<FONT color="green">195</FONT>                    processRecommendation(contract, buySellRec, purchaseDate, purchasePrice);<a name="line.195"></a>
+<FONT color="green">196</FONT>                }<a name="line.196"></a>
+<FONT color="green">197</FONT>        //      processStopLosses();<a name="line.197"></a>
+<FONT color="green">198</FONT>        //      setNewStopLosses();<a name="line.198"></a>
+<FONT color="green">199</FONT>            }<a name="line.199"></a>
+<FONT color="green">200</FONT>        }<a name="line.200"></a>
+<FONT color="green">201</FONT>    <a name="line.201"></a>
+<FONT color="green">202</FONT>        /**<a name="line.202"></a>
+<FONT color="green">203</FONT>         *  This method wraps up all open orders at the end of the simulation.<a name="line.203"></a>
+<FONT color="green">204</FONT>         */<a name="line.204"></a>
+<FONT color="green">205</FONT>        private void wrapUpProcessing() {<a name="line.205"></a>
+<FONT color="green">206</FONT>            Iterator it = openOrders.keySet().iterator();<a name="line.206"></a>
+<FONT color="green">207</FONT>            while (it.hasNext()) {<a name="line.207"></a>
+<FONT color="green">208</FONT>                Contract contract = (Contract)it.next();<a name="line.208"></a>
+<FONT color="green">209</FONT>                LinkedList orders = (LinkedList)openOrders.get(contract);<a name="line.209"></a>
+<FONT color="green">210</FONT>                if (orders.size() > 0) {<a name="line.210"></a>
+<FONT color="green">211</FONT>                    processRecommendation(contract,<a name="line.211"></a>
+<FONT color="green">212</FONT>                                          (((Order)orders.getFirst()).isBuy())?Recommendation.SETTLE_SELL:Recommendation.SETTLE_BUY,<a name="line.212"></a>
+<FONT color="green">213</FONT>                                          wrapupDate,<a name="line.213"></a>
+<FONT color="green">214</FONT>                                          contract.getPrices(wrapupDate).getClose());<a name="line.214"></a>
+<FONT color="green">215</FONT>                }<a name="line.215"></a>
+<FONT color="green">216</FONT>            }<a name="line.216"></a>
+<FONT color="green">217</FONT>        }<a name="line.217"></a>
+<FONT color="green">218</FONT>    <a name="line.218"></a>
+<FONT color="green">219</FONT>        /**<a name="line.219"></a>
+<FONT color="green">220</FONT>         *  Process a recommended buy or sell order by checking existing orders for<a name="line.220"></a>
+<FONT color="green">221</FONT>         *  an offsetting order and if none is found, adding it to the list.  If an<a name="line.221"></a>
+<FONT color="green">222</FONT>         *  offsetting order is found, the profit/loss is calculated and the offsetting<a name="line.222"></a>
+<FONT color="green">223</FONT>         *  order is removed from the list.<a name="line.223"></a>
+<FONT color="green">224</FONT>         *<a name="line.224"></a>
+<FONT color="green">225</FONT>         *  @param  contract        The contract to be bought/sold.<a name="line.225"></a>
+<FONT color="green">226</FONT>         *  @param  buySellRec      The buy/sell recommendation.<a name="line.226"></a>
+<FONT color="green">227</FONT>         *  @param  purchaseDate    The date the contract was purchased.<a name="line.227"></a>
+<FONT color="green">228</FONT>         *  @param  purchasePrice   The price of the contract was purchased for.<a name="line.228"></a>
+<FONT color="green">229</FONT>         */<a name="line.229"></a>
+<FONT color="green">230</FONT>        private void processRecommendation(Contract contract,<a name="line.230"></a>
+<FONT color="green">231</FONT>                                           int buySellRec,<a name="line.231"></a>
+<FONT color="green">232</FONT>                                           java.util.Date purchaseDate,<a name="line.232"></a>
+<FONT color="green">233</FONT>                                           double purchasePrice) {<a name="line.233"></a>
+<FONT color="green">234</FONT>            if (!openOrders.containsKey(contract)) {<a name="line.234"></a>
+<FONT color="green">235</FONT>                openOrders.put(contract, new LinkedList());<a name="line.235"></a>
+<FONT color="green">236</FONT>            }<a name="line.236"></a>
+<FONT color="green">237</FONT>            LinkedList orders = (LinkedList)openOrders.get(contract);<a name="line.237"></a>
+<FONT color="green">238</FONT>    <a name="line.238"></a>
+<FONT color="green">239</FONT>            Iterator it = orders.iterator();<a name="line.239"></a>
+<FONT color="green">240</FONT>            while (it.hasNext()) {<a name="line.240"></a>
+<FONT color="green">241</FONT>                Order order = (Order)it.next();<a name="line.241"></a>
+<FONT color="green">242</FONT>                if (order.isBuy() && ((buySellRec == Recommendation.SELL) || (buySellRec == Recommendation.SETTLE_SELL))) {<a name="line.242"></a>
+<FONT color="green">243</FONT>                    calculateProfit(contract, order.getPrice(), purchasePrice);<a name="line.243"></a>
+<FONT color="green">244</FONT>                    it.remove();<a name="line.244"></a>
+<FONT color="green">245</FONT>                } else if (!order.isBuy() && ((buySellRec == Recommendation.BUY) || (buySellRec == Recommendation.SETTLE_BUY))) {<a name="line.245"></a>
+<FONT color="green">246</FONT>                    calculateProfit(contract, purchasePrice, order.getPrice());<a name="line.246"></a>
+<FONT color="green">247</FONT>                    it.remove();<a name="line.247"></a>
+<FONT color="green">248</FONT>                }<a name="line.248"></a>
+<FONT color="green">249</FONT>            }<a name="line.249"></a>
+<FONT color="green">250</FONT>    <a name="line.250"></a>
+<FONT color="green">251</FONT>            if (buySellRec == Recommendation.BUY) {<a name="line.251"></a>
+<FONT color="green">252</FONT>                orders.add(new Order(true, purchaseDate, purchasePrice));<a name="line.252"></a>
+<FONT color="green">253</FONT>            } else if (buySellRec == Recommendation.SELL) {<a name="line.253"></a>
+<FONT color="green">254</FONT>                orders.add(new Order(false, purchaseDate, purchasePrice));<a name="line.254"></a>
+<FONT color="green">255</FONT>            }<a name="line.255"></a>
+<FONT color="green">256</FONT>        }<a name="line.256"></a>
+<FONT color="green">257</FONT>    <a name="line.257"></a>
+<FONT color="green">258</FONT>        /**<a name="line.258"></a>
+<FONT color="green">259</FONT>         *  Calculate the profit/loss of a trade and record the results<a name="line.259"></a>
+<FONT color="green">260</FONT>         *  appropriately.<a name="line.260"></a>
+<FONT color="green">261</FONT>         *<a name="line.261"></a>
+<FONT color="green">262</FONT>         *  @param  contract    The contract that has been bought and sold.<a name="line.262"></a>
+<FONT color="green">263</FONT>         *  @param  buyValue    The buy price of the contract.<a name="line.263"></a>
+<FONT color="green">264</FONT>         *  @param  sellValue   The sell price of the contract.<a name="line.264"></a>
+<FONT color="green">265</FONT>         */<a name="line.265"></a>
+<FONT color="green">266</FONT>        private void calculateProfit(Contract contract, double buyValue, double sellValue) {<a name="line.266"></a>
+<FONT color="green">267</FONT>            double tickPrice = Commodity.bySymbol(contract.getSymbol()).getTickPrice();<a name="line.267"></a>
+<FONT color="green">268</FONT>            double tickSize  = Commodity.bySymbol(contract.getSymbol()).getTickSize();<a name="line.268"></a>
+<FONT color="green">269</FONT>            double p = (sellValue - buyValue) / tickSize * tickPrice;<a name="line.269"></a>
+<FONT color="green">270</FONT>            stats.addProfit(p);<a name="line.270"></a>
+<FONT color="green">271</FONT>        }<a name="line.271"></a>
+<FONT color="green">272</FONT>    }<a name="line.272"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

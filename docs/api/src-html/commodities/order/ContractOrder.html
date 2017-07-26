@@ -1,0 +1,876 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*  x Properly Documented<a name="line.1"></a>
+<FONT color="green">002</FONT>     */<a name="line.2"></a>
+<FONT color="green">003</FONT>    package commodities.order;<a name="line.3"></a>
+<FONT color="green">004</FONT>    <a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.io.*;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.util.*;<a name="line.6"></a>
+<FONT color="green">007</FONT>    <a name="line.7"></a>
+<FONT color="green">008</FONT>    import commodities.dataaccess.*;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import commodities.util.*;<a name="line.9"></a>
+<FONT color="green">010</FONT>    <a name="line.10"></a>
+<FONT color="green">011</FONT>    import com.util.FormatDate;<a name="line.11"></a>
+<FONT color="green">012</FONT>    <a name="line.12"></a>
+<FONT color="green">013</FONT>    /**<a name="line.13"></a>
+<FONT color="green">014</FONT>     *  The ContractOrder class contains the information for a single<a name="line.14"></a>
+<FONT color="green">015</FONT>     *  buy or sell contract order.  This includes the commodity, the<a name="line.15"></a>
+<FONT color="green">016</FONT>     *  number of contracts, the order's status, and any prices associated<a name="line.16"></a>
+<FONT color="green">017</FONT>     *  with the contract.<a name="line.17"></a>
+<FONT color="green">018</FONT>     *<a name="line.18"></a>
+<FONT color="green">019</FONT>     *  If an order is not totally fulfilled then a single order may need to<a name="line.19"></a>
+<FONT color="green">020</FONT>     *  be broken up into multiple orders, one for the fulfilled amount and<a name="line.20"></a>
+<FONT color="green">021</FONT>     *  a second for the remaining unfullfilled amount.<a name="line.21"></a>
+<FONT color="green">022</FONT>     *<a name="line.22"></a>
+<FONT color="green">023</FONT>     *  @author J.R. Titko<a name="line.23"></a>
+<FONT color="green">024</FONT>     *  @version 1.0<a name="line.24"></a>
+<FONT color="green">025</FONT>     *  @update 2004.11.11<a name="line.25"></a>
+<FONT color="green">026</FONT>     */<a name="line.26"></a>
+<FONT color="green">027</FONT>    <a name="line.27"></a>
+<FONT color="green">028</FONT>    public class ContractOrder {<a name="line.28"></a>
+<FONT color="green">029</FONT>    /* *************************************** */<a name="line.29"></a>
+<FONT color="green">030</FONT>    /* *** CLASS VARIABLES                 *** */<a name="line.30"></a>
+<FONT color="green">031</FONT>    /* *************************************** */<a name="line.31"></a>
+<FONT color="green">032</FONT>        /** The singleton instance of the DataManagerFactory. */<a name="line.32"></a>
+<FONT color="green">033</FONT>        private static DataManagerInterface dataManager = DataManagerFactory.instance();<a name="line.33"></a>
+<FONT color="green">034</FONT>    <a name="line.34"></a>
+<FONT color="green">035</FONT>        /** Properties file identifier for the properties manager. */<a name="line.35"></a>
+<FONT color="green">036</FONT>        private static final String PROPERTIES_FILE = "dataaccess";<a name="line.36"></a>
+<FONT color="green">037</FONT>        /** The property name for date formatting on the order screen. */<a name="line.37"></a>
+<FONT color="green">038</FONT>        private static final String DATE_FORMAT = "dateformat.orderscreen";<a name="line.38"></a>
+<FONT color="green">039</FONT>    <a name="line.39"></a>
+<FONT color="green">040</FONT>        /** A long (buy) possition for an order. */<a name="line.40"></a>
+<FONT color="green">041</FONT>        public static final boolean LONG = true;<a name="line.41"></a>
+<FONT color="green">042</FONT>        /** A short (sell) possition for an order. */<a name="line.42"></a>
+<FONT color="green">043</FONT>        public static final boolean SHORT = false;<a name="line.43"></a>
+<FONT color="green">044</FONT>    <a name="line.44"></a>
+<FONT color="green">045</FONT>        /** The index of the last order placed */<a name="line.45"></a>
+<FONT color="green">046</FONT>        private static long index = -1;<a name="line.46"></a>
+<FONT color="green">047</FONT>    <a name="line.47"></a>
+<FONT color="green">048</FONT>    /* *************************************** */<a name="line.48"></a>
+<FONT color="green">049</FONT>    /* *** INSTANCE VARIABLES              *** */<a name="line.49"></a>
+<FONT color="green">050</FONT>    /* *************************************** */<a name="line.50"></a>
+<FONT color="green">051</FONT>        /** A unique id to identify this contract order.  */<a name="line.51"></a>
+<FONT color="green">052</FONT>        private long    id;<a name="line.52"></a>
+<FONT color="green">053</FONT>        /** The account number for this order. */<a name="line.53"></a>
+<FONT color="green">054</FONT>        private int acctNumber;<a name="line.54"></a>
+<FONT color="green">055</FONT>        /** LONG or SHORT order. */<a name="line.55"></a>
+<FONT color="green">056</FONT>        private boolean orderType;<a name="line.56"></a>
+<FONT color="green">057</FONT>        /**<a name="line.57"></a>
+<FONT color="green">058</FONT>         *  The date the order was recorded to have taken place.<a name="line.58"></a>
+<FONT color="green">059</FONT>         *  This is not necessarially the date that the contract<a name="line.59"></a>
+<FONT color="green">060</FONT>         *  was entered into the system, but rather the date that<a name="line.60"></a>
+<FONT color="green">061</FONT>         *  was entered by the user.<a name="line.61"></a>
+<FONT color="green">062</FONT>         */<a name="line.62"></a>
+<FONT color="green">063</FONT>        private Date    date = null;<a name="line.63"></a>
+<FONT color="green">064</FONT>        /** The number of contracts in this order. */<a name="line.64"></a>
+<FONT color="green">065</FONT>        private Integer number = new Integer(0);<a name="line.65"></a>
+<FONT color="green">066</FONT>        /** The month of the commodity. */<a name="line.66"></a>
+<FONT color="green">067</FONT>        private String  month = "";<a name="line.67"></a>
+<FONT color="green">068</FONT>        /** The name of the commodity. */<a name="line.68"></a>
+<FONT color="green">069</FONT>        private String  commodityName = "";              // ???? should this be the commodity itself or maybe the contract<a name="line.69"></a>
+<FONT color="green">070</FONT>        /** The desired price. */<a name="line.70"></a>
+<FONT color="green">071</FONT>        private Double  desiredPrice = new Double(0);<a name="line.71"></a>
+<FONT color="green">072</FONT>        /** The stop price. */<a name="line.72"></a>
+<FONT color="green">073</FONT>        private Double  stopPrice = new Double(0);<a name="line.73"></a>
+<FONT color="green">074</FONT>        /** The status of this order. */<a name="line.74"></a>
+<FONT color="green">075</FONT>        private String  status = ContractPanel.NO_STATUS;<a name="line.75"></a>
+<FONT color="green">076</FONT>        /** The actual price that the order was filled at. */<a name="line.76"></a>
+<FONT color="green">077</FONT>        private Double  actualPrice = new Double(0);<a name="line.77"></a>
+<FONT color="green">078</FONT>        /** A note associated with the order. */<a name="line.78"></a>
+<FONT color="green">079</FONT>        private String  note = "";<a name="line.79"></a>
+<FONT color="green">080</FONT>    <a name="line.80"></a>
+<FONT color="green">081</FONT>        /** The offsetting order of this order. */<a name="line.81"></a>
+<FONT color="green">082</FONT>        private long  offsettingOrder = -1;<a name="line.82"></a>
+<FONT color="green">083</FONT>        /** The date this order was considered. */<a name="line.83"></a>
+<FONT color="green">084</FONT>        private Date  dateConsidered = null;<a name="line.84"></a>
+<FONT color="green">085</FONT>        /** The date this order was placed. */<a name="line.85"></a>
+<FONT color="green">086</FONT>        private Date  datePlaced = null;<a name="line.86"></a>
+<FONT color="green">087</FONT>        /** The date this order was filled. */<a name="line.87"></a>
+<FONT color="green">088</FONT>        private Date  dateFilled = null;<a name="line.88"></a>
+<FONT color="green">089</FONT>        /** The date this order had a cancel placed. */<a name="line.89"></a>
+<FONT color="green">090</FONT>        private Date  dateCancelPlaced = null;<a name="line.90"></a>
+<FONT color="green">091</FONT>        /** The date this order was cancelled. */<a name="line.91"></a>
+<FONT color="green">092</FONT>        private Date  dateCancelled = null;<a name="line.92"></a>
+<FONT color="green">093</FONT>        /** The date this order had a stop loss. */<a name="line.93"></a>
+<FONT color="green">094</FONT>        private Date  dateStopLoss = null;<a name="line.94"></a>
+<FONT color="green">095</FONT>    <a name="line.95"></a>
+<FONT color="green">096</FONT>    /* *************************************** */<a name="line.96"></a>
+<FONT color="green">097</FONT>    /* *** CONSTRUCTORS                    *** */<a name="line.97"></a>
+<FONT color="green">098</FONT>    /* *************************************** */<a name="line.98"></a>
+<FONT color="green">099</FONT>        /**<a name="line.99"></a>
+<FONT color="green">100</FONT>         *  Creates a single commodity order.<a name="line.100"></a>
+<FONT color="green">101</FONT>         *<a name="line.101"></a>
+<FONT color="green">102</FONT>         *  @param  acctNumber  The account number that owns the order<a name="line.102"></a>
+<FONT color="green">103</FONT>         *  @param  orderType   LONG for a buy order or SHORT for a sell order<a name="line.103"></a>
+<FONT color="green">104</FONT>         */<a name="line.104"></a>
+<FONT color="green">105</FONT>        public ContractOrder(int acctNumber, boolean orderType) {<a name="line.105"></a>
+<FONT color="green">106</FONT>            this(acctNumber,<a name="line.106"></a>
+<FONT color="green">107</FONT>                 orderType,<a name="line.107"></a>
+<FONT color="green">108</FONT>                 null,<a name="line.108"></a>
+<FONT color="green">109</FONT>                 new Integer(0),<a name="line.109"></a>
+<FONT color="green">110</FONT>                 "",<a name="line.110"></a>
+<FONT color="green">111</FONT>                 "",<a name="line.111"></a>
+<FONT color="green">112</FONT>                 new Double(0),<a name="line.112"></a>
+<FONT color="green">113</FONT>                 new Double(0),<a name="line.113"></a>
+<FONT color="green">114</FONT>                 ContractPanel.NO_STATUS,<a name="line.114"></a>
+<FONT color="green">115</FONT>                 new Double(0),<a name="line.115"></a>
+<FONT color="green">116</FONT>                 "");<a name="line.116"></a>
+<FONT color="green">117</FONT>        }<a name="line.117"></a>
+<FONT color="green">118</FONT>    <a name="line.118"></a>
+<FONT color="green">119</FONT>        /**<a name="line.119"></a>
+<FONT color="green">120</FONT>         *  Creates a single commodity order.<a name="line.120"></a>
+<FONT color="green">121</FONT>         *<a name="line.121"></a>
+<FONT color="green">122</FONT>         *  @param  acctNumber      The account number that owns the order<a name="line.122"></a>
+<FONT color="green">123</FONT>         *  @param  orderType       LONG for a buy order or SHORT for a sell order<a name="line.123"></a>
+<FONT color="green">124</FONT>         *  @param  date            the date<a name="line.124"></a>
+<FONT color="green">125</FONT>         *  @param  number          the number of contracts<a name="line.125"></a>
+<FONT color="green">126</FONT>         *  @param  month           the month of the commodity<a name="line.126"></a>
+<FONT color="green">127</FONT>         *  @param  commodityName   the name of the commodity and exchange<a name="line.127"></a>
+<FONT color="green">128</FONT>         *  @param  desiredPrice    the desired price<a name="line.128"></a>
+<FONT color="green">129</FONT>         *  @param  stopPrice       the stop price<a name="line.129"></a>
+<FONT color="green">130</FONT>         *  @param  status          the order's status<a name="line.130"></a>
+<FONT color="green">131</FONT>         *  @param  actualPrice     the actual price<a name="line.131"></a>
+<FONT color="green">132</FONT>         *  @param  note            the note<a name="line.132"></a>
+<FONT color="green">133</FONT>         */<a name="line.133"></a>
+<FONT color="green">134</FONT>        public ContractOrder(int acctNumber,<a name="line.134"></a>
+<FONT color="green">135</FONT>                             boolean orderType,<a name="line.135"></a>
+<FONT color="green">136</FONT>                             Date date,<a name="line.136"></a>
+<FONT color="green">137</FONT>                             Integer number,<a name="line.137"></a>
+<FONT color="green">138</FONT>                             String month,<a name="line.138"></a>
+<FONT color="green">139</FONT>                             String commodityName,<a name="line.139"></a>
+<FONT color="green">140</FONT>                             Double desiredPrice,<a name="line.140"></a>
+<FONT color="green">141</FONT>                             Double stopPrice,<a name="line.141"></a>
+<FONT color="green">142</FONT>                             String status,<a name="line.142"></a>
+<FONT color="green">143</FONT>                             Double actualPrice,<a name="line.143"></a>
+<FONT color="green">144</FONT>                             String note) {<a name="line.144"></a>
+<FONT color="green">145</FONT>    <a name="line.145"></a>
+<FONT color="green">146</FONT>            this(-1,<a name="line.146"></a>
+<FONT color="green">147</FONT>                 acctNumber,<a name="line.147"></a>
+<FONT color="green">148</FONT>                 orderType,<a name="line.148"></a>
+<FONT color="green">149</FONT>                 date,<a name="line.149"></a>
+<FONT color="green">150</FONT>                 number,<a name="line.150"></a>
+<FONT color="green">151</FONT>                 month,<a name="line.151"></a>
+<FONT color="green">152</FONT>                 commodityName,<a name="line.152"></a>
+<FONT color="green">153</FONT>                 desiredPrice,<a name="line.153"></a>
+<FONT color="green">154</FONT>                 stopPrice,<a name="line.154"></a>
+<FONT color="green">155</FONT>                 status,<a name="line.155"></a>
+<FONT color="green">156</FONT>                 actualPrice,<a name="line.156"></a>
+<FONT color="green">157</FONT>                 note,<a name="line.157"></a>
+<FONT color="green">158</FONT>                 -1l,<a name="line.158"></a>
+<FONT color="green">159</FONT>                 null,<a name="line.159"></a>
+<FONT color="green">160</FONT>                 null,<a name="line.160"></a>
+<FONT color="green">161</FONT>                 null,<a name="line.161"></a>
+<FONT color="green">162</FONT>                 null,<a name="line.162"></a>
+<FONT color="green">163</FONT>                 null,<a name="line.163"></a>
+<FONT color="green">164</FONT>                 null);<a name="line.164"></a>
+<FONT color="green">165</FONT>        }<a name="line.165"></a>
+<FONT color="green">166</FONT>    <a name="line.166"></a>
+<FONT color="green">167</FONT>        /**<a name="line.167"></a>
+<FONT color="green">168</FONT>         *  Creates a single commodity order.<a name="line.168"></a>
+<FONT color="green">169</FONT>         *<a name="line.169"></a>
+<FONT color="green">170</FONT>         *  @param  id              the order id<a name="line.170"></a>
+<FONT color="green">171</FONT>         *  @param  acctNumber      The account number that owns the order<a name="line.171"></a>
+<FONT color="green">172</FONT>         *  @param  orderType       LONG for a buy order or SHORT for a sell order<a name="line.172"></a>
+<FONT color="green">173</FONT>         *  @param  date            the date<a name="line.173"></a>
+<FONT color="green">174</FONT>         *  @param  number          the number of contracts<a name="line.174"></a>
+<FONT color="green">175</FONT>         *  @param  month           the month of the commodity<a name="line.175"></a>
+<FONT color="green">176</FONT>         *  @param  commodityName   the name of the commodity and exchange<a name="line.176"></a>
+<FONT color="green">177</FONT>         *  @param  desiredPrice    the desired price<a name="line.177"></a>
+<FONT color="green">178</FONT>         *  @param  stopPrice       the stop price<a name="line.178"></a>
+<FONT color="green">179</FONT>         *  @param  status          the order's status<a name="line.179"></a>
+<FONT color="green">180</FONT>         *  @param  actualPrice     the actual price<a name="line.180"></a>
+<FONT color="green">181</FONT>         *  @param  note            the note<a name="line.181"></a>
+<FONT color="green">182</FONT>         *  @param  offsettingOrder the offsetting order or -1 for none<a name="line.182"></a>
+<FONT color="green">183</FONT>         *  @param  dateConsidered  the date the order was considered or null<a name="line.183"></a>
+<FONT color="green">184</FONT>         *  @param  datePlaced      the date the order was placed or null<a name="line.184"></a>
+<FONT color="green">185</FONT>         *  @param  dateFilled      the date the order was filled or null<a name="line.185"></a>
+<FONT color="green">186</FONT>         *  @param  dateCancelPlaced    the date the order had a cancel placed or null<a name="line.186"></a>
+<FONT color="green">187</FONT>         *  @param  dateCancelled   the date the order was cancelled or null<a name="line.187"></a>
+<FONT color="green">188</FONT>         *  @param  dateStopLoss    the date the order had a stop loss or null<a name="line.188"></a>
+<FONT color="green">189</FONT>         */<a name="line.189"></a>
+<FONT color="green">190</FONT>        public ContractOrder(long id,<a name="line.190"></a>
+<FONT color="green">191</FONT>                             int acctNumber,<a name="line.191"></a>
+<FONT color="green">192</FONT>                             boolean orderType,<a name="line.192"></a>
+<FONT color="green">193</FONT>                             Date date,<a name="line.193"></a>
+<FONT color="green">194</FONT>                             Integer number,<a name="line.194"></a>
+<FONT color="green">195</FONT>                             String month,<a name="line.195"></a>
+<FONT color="green">196</FONT>                             String commodityName,<a name="line.196"></a>
+<FONT color="green">197</FONT>                             Double desiredPrice,<a name="line.197"></a>
+<FONT color="green">198</FONT>                             Double stopPrice,<a name="line.198"></a>
+<FONT color="green">199</FONT>                             String status,<a name="line.199"></a>
+<FONT color="green">200</FONT>                             Double actualPrice,<a name="line.200"></a>
+<FONT color="green">201</FONT>                             String note,<a name="line.201"></a>
+<FONT color="green">202</FONT>                             long   offsettingOrder,<a name="line.202"></a>
+<FONT color="green">203</FONT>                             Date   dateConsidered,<a name="line.203"></a>
+<FONT color="green">204</FONT>                             Date   datePlaced,<a name="line.204"></a>
+<FONT color="green">205</FONT>                             Date   dateFilled,<a name="line.205"></a>
+<FONT color="green">206</FONT>                             Date   dateCancelPlaced,<a name="line.206"></a>
+<FONT color="green">207</FONT>                             Date   dateCancelled,<a name="line.207"></a>
+<FONT color="green">208</FONT>                             Date   dateStopLoss) {<a name="line.208"></a>
+<FONT color="green">209</FONT>            this(id,<a name="line.209"></a>
+<FONT color="green">210</FONT>                 acctNumber,<a name="line.210"></a>
+<FONT color="green">211</FONT>                 orderType,<a name="line.211"></a>
+<FONT color="green">212</FONT>                 date,<a name="line.212"></a>
+<FONT color="green">213</FONT>                 number,<a name="line.213"></a>
+<FONT color="green">214</FONT>                 month,<a name="line.214"></a>
+<FONT color="green">215</FONT>                 commodityName,<a name="line.215"></a>
+<FONT color="green">216</FONT>                 desiredPrice,<a name="line.216"></a>
+<FONT color="green">217</FONT>                 stopPrice,<a name="line.217"></a>
+<FONT color="green">218</FONT>                 status,<a name="line.218"></a>
+<FONT color="green">219</FONT>                 actualPrice,<a name="line.219"></a>
+<FONT color="green">220</FONT>                 note,<a name="line.220"></a>
+<FONT color="green">221</FONT>                 offsettingOrder,<a name="line.221"></a>
+<FONT color="green">222</FONT>                 dateConsidered,<a name="line.222"></a>
+<FONT color="green">223</FONT>                 datePlaced,<a name="line.223"></a>
+<FONT color="green">224</FONT>                 dateFilled,<a name="line.224"></a>
+<FONT color="green">225</FONT>                 dateCancelPlaced,<a name="line.225"></a>
+<FONT color="green">226</FONT>                 dateCancelled,<a name="line.226"></a>
+<FONT color="green">227</FONT>                 dateStopLoss,<a name="line.227"></a>
+<FONT color="green">228</FONT>                 false);<a name="line.228"></a>
+<FONT color="green">229</FONT>        }<a name="line.229"></a>
+<FONT color="green">230</FONT>    <a name="line.230"></a>
+<FONT color="green">231</FONT>        /**<a name="line.231"></a>
+<FONT color="green">232</FONT>         *  Creates a single commodity order.<a name="line.232"></a>
+<FONT color="green">233</FONT>         *<a name="line.233"></a>
+<FONT color="green">234</FONT>         *  @param  id              the order id<a name="line.234"></a>
+<FONT color="green">235</FONT>         *  @param  acctNumber      The account number that owns the order<a name="line.235"></a>
+<FONT color="green">236</FONT>         *  @param  orderType       LONG for a buy order or SHORT for a sell order<a name="line.236"></a>
+<FONT color="green">237</FONT>         *  @param  date            the date<a name="line.237"></a>
+<FONT color="green">238</FONT>         *  @param  number          the number of contracts<a name="line.238"></a>
+<FONT color="green">239</FONT>         *  @param  month           the month of the commodity<a name="line.239"></a>
+<FONT color="green">240</FONT>         *  @param  commodityName   the name of the commodity and exchange<a name="line.240"></a>
+<FONT color="green">241</FONT>         *  @param  desiredPrice    the desired price<a name="line.241"></a>
+<FONT color="green">242</FONT>         *  @param  stopPrice       the stop price<a name="line.242"></a>
+<FONT color="green">243</FONT>         *  @param  status          the order's status<a name="line.243"></a>
+<FONT color="green">244</FONT>         *  @param  actualPrice     the actual price<a name="line.244"></a>
+<FONT color="green">245</FONT>         *  @param  note            the note<a name="line.245"></a>
+<FONT color="green">246</FONT>         *  @param  offsettingOrder the offsetting order or -1 for none<a name="line.246"></a>
+<FONT color="green">247</FONT>         *  @param  dateConsidered  the date the order was considered or null<a name="line.247"></a>
+<FONT color="green">248</FONT>         *  @param  datePlaced      the date the order was placed or null<a name="line.248"></a>
+<FONT color="green">249</FONT>         *  @param  dateFilled      the date the order was filled or null<a name="line.249"></a>
+<FONT color="green">250</FONT>         *  @param  dateCancelPlaced    the date the order had a cancel placed or null<a name="line.250"></a>
+<FONT color="green">251</FONT>         *  @param  dateCancelled   the date the order was cancelled or null<a name="line.251"></a>
+<FONT color="green">252</FONT>         *  @param  dateStopLoss    the date the order had a stop loss or null<a name="line.252"></a>
+<FONT color="green">253</FONT>         *  @param  initialLoad     is this the initial screen load<a name="line.253"></a>
+<FONT color="green">254</FONT>         */<a name="line.254"></a>
+<FONT color="green">255</FONT>        public ContractOrder(long id,<a name="line.255"></a>
+<FONT color="green">256</FONT>                             int acctNumber,<a name="line.256"></a>
+<FONT color="green">257</FONT>                             boolean orderType,<a name="line.257"></a>
+<FONT color="green">258</FONT>                             Date date,<a name="line.258"></a>
+<FONT color="green">259</FONT>                             Integer number,<a name="line.259"></a>
+<FONT color="green">260</FONT>                             String month,<a name="line.260"></a>
+<FONT color="green">261</FONT>                             String commodityName,<a name="line.261"></a>
+<FONT color="green">262</FONT>                             Double desiredPrice,<a name="line.262"></a>
+<FONT color="green">263</FONT>                             Double stopPrice,<a name="line.263"></a>
+<FONT color="green">264</FONT>                             String status,<a name="line.264"></a>
+<FONT color="green">265</FONT>                             Double actualPrice,<a name="line.265"></a>
+<FONT color="green">266</FONT>                             String note,<a name="line.266"></a>
+<FONT color="green">267</FONT>                             long   offsettingOrder,<a name="line.267"></a>
+<FONT color="green">268</FONT>                             Date   dateConsidered,<a name="line.268"></a>
+<FONT color="green">269</FONT>                             Date   datePlaced,<a name="line.269"></a>
+<FONT color="green">270</FONT>                             Date   dateFilled,<a name="line.270"></a>
+<FONT color="green">271</FONT>                             Date   dateCancelPlaced,<a name="line.271"></a>
+<FONT color="green">272</FONT>                             Date   dateCancelled,<a name="line.272"></a>
+<FONT color="green">273</FONT>                             Date   dateStopLoss,<a name="line.273"></a>
+<FONT color="green">274</FONT>                             boolean initialLoad) {<a name="line.274"></a>
+<FONT color="green">275</FONT>            if (id == -1) {<a name="line.275"></a>
+<FONT color="green">276</FONT>                setId();<a name="line.276"></a>
+<FONT color="green">277</FONT>            } else {<a name="line.277"></a>
+<FONT color="green">278</FONT>                this.id             = id;<a name="line.278"></a>
+<FONT color="green">279</FONT>            }<a name="line.279"></a>
+<FONT color="green">280</FONT>            this.acctNumber         = acctNumber;<a name="line.280"></a>
+<FONT color="green">281</FONT>            this.orderType          = orderType;<a name="line.281"></a>
+<FONT color="green">282</FONT>    <a name="line.282"></a>
+<FONT color="green">283</FONT>            if (date == null) {<a name="line.283"></a>
+<FONT color="green">284</FONT>                CommodityCalendar calendar = (CommodityCalendar)CommodityCalendar.getInstance();<a name="line.284"></a>
+<FONT color="green">285</FONT>                calendar.clearTime();<a name="line.285"></a>
+<FONT color="green">286</FONT>                this.date = calendar.getTime();<a name="line.286"></a>
+<FONT color="green">287</FONT>            } else {<a name="line.287"></a>
+<FONT color="green">288</FONT>                this.date = date;<a name="line.288"></a>
+<FONT color="green">289</FONT>            }<a name="line.289"></a>
+<FONT color="green">290</FONT>    <a name="line.290"></a>
+<FONT color="green">291</FONT>            this.number             = number;<a name="line.291"></a>
+<FONT color="green">292</FONT>            this.month              = month;<a name="line.292"></a>
+<FONT color="green">293</FONT>            this.commodityName      = commodityName;<a name="line.293"></a>
+<FONT color="green">294</FONT>            this.desiredPrice       = desiredPrice;<a name="line.294"></a>
+<FONT color="green">295</FONT>            this.stopPrice          = stopPrice;<a name="line.295"></a>
+<FONT color="green">296</FONT>            this.status             = status;<a name="line.296"></a>
+<FONT color="green">297</FONT>            this.actualPrice        = actualPrice;<a name="line.297"></a>
+<FONT color="green">298</FONT>            this.note               = note;<a name="line.298"></a>
+<FONT color="green">299</FONT>            this.offsettingOrder    = offsettingOrder;<a name="line.299"></a>
+<FONT color="green">300</FONT>            this.dateConsidered     = dateConsidered;<a name="line.300"></a>
+<FONT color="green">301</FONT>            this.datePlaced         = datePlaced;<a name="line.301"></a>
+<FONT color="green">302</FONT>            this.dateFilled         = dateFilled;<a name="line.302"></a>
+<FONT color="green">303</FONT>            this.dateCancelPlaced   = dateCancelPlaced;<a name="line.303"></a>
+<FONT color="green">304</FONT>            this.dateCancelled      = dateCancelled;<a name="line.304"></a>
+<FONT color="green">305</FONT>            this.dateStopLoss       = dateStopLoss;<a name="line.305"></a>
+<FONT color="green">306</FONT>    <a name="line.306"></a>
+<FONT color="green">307</FONT>            if (!initialLoad && !ContractPanel.NO_STATUS.equals(status)) {<a name="line.307"></a>
+<FONT color="green">308</FONT>                recordOrder();<a name="line.308"></a>
+<FONT color="green">309</FONT>            }<a name="line.309"></a>
+<FONT color="green">310</FONT>        }<a name="line.310"></a>
+<FONT color="green">311</FONT>    <a name="line.311"></a>
+<FONT color="green">312</FONT>    /* *************************************** */<a name="line.312"></a>
+<FONT color="green">313</FONT>    /* *** GET AND SET METHODS             *** */<a name="line.313"></a>
+<FONT color="green">314</FONT>    /* *************************************** */<a name="line.314"></a>
+<FONT color="green">315</FONT>        /**<a name="line.315"></a>
+<FONT color="green">316</FONT>         *  Get the orders unique id.<a name="line.316"></a>
+<FONT color="green">317</FONT>         *<a name="line.317"></a>
+<FONT color="green">318</FONT>         *  @return     the order's unique id.<a name="line.318"></a>
+<FONT color="green">319</FONT>         */<a name="line.319"></a>
+<FONT color="green">320</FONT>        public  long getId() {<a name="line.320"></a>
+<FONT color="green">321</FONT>            return id;<a name="line.321"></a>
+<FONT color="green">322</FONT>        }<a name="line.322"></a>
+<FONT color="green">323</FONT>    <a name="line.323"></a>
+<FONT color="green">324</FONT>        /**<a name="line.324"></a>
+<FONT color="green">325</FONT>         *  Get the account number which owns this order.<a name="line.325"></a>
+<FONT color="green">326</FONT>         *  @return     the account number.<a name="line.326"></a>
+<FONT color="green">327</FONT>         */<a name="line.327"></a>
+<FONT color="green">328</FONT>        public  int getAccountNumber() {<a name="line.328"></a>
+<FONT color="green">329</FONT>            return acctNumber;<a name="line.329"></a>
+<FONT color="green">330</FONT>        }<a name="line.330"></a>
+<FONT color="green">331</FONT>    <a name="line.331"></a>
+<FONT color="green">332</FONT>        /**<a name="line.332"></a>
+<FONT color="green">333</FONT>         *  Get if this order is a buy (long) order or a sell (short) order.  True<a name="line.333"></a>
+<FONT color="green">334</FONT>         *  indicates a buy order, false indicates a sell order.<a name="line.334"></a>
+<FONT color="green">335</FONT>         *  @return     true if a buy order; false for a sell order<a name="line.335"></a>
+<FONT color="green">336</FONT>         */<a name="line.336"></a>
+<FONT color="green">337</FONT>        public  boolean isLongOrder() {<a name="line.337"></a>
+<FONT color="green">338</FONT>            return orderType;<a name="line.338"></a>
+<FONT color="green">339</FONT>        }<a name="line.339"></a>
+<FONT color="green">340</FONT>    <a name="line.340"></a>
+<FONT color="green">341</FONT>        /**<a name="line.341"></a>
+<FONT color="green">342</FONT>         *  Get the date the order was recorded as having taken place.<a name="line.342"></a>
+<FONT color="green">343</FONT>         *  @return     the date of the order.<a name="line.343"></a>
+<FONT color="green">344</FONT>         */<a name="line.344"></a>
+<FONT color="green">345</FONT>        public  Date getDate() {<a name="line.345"></a>
+<FONT color="green">346</FONT>            return date;<a name="line.346"></a>
+<FONT color="green">347</FONT>        }<a name="line.347"></a>
+<FONT color="green">348</FONT>    <a name="line.348"></a>
+<FONT color="green">349</FONT>        /**<a name="line.349"></a>
+<FONT color="green">350</FONT>         *  Get the number of contracts in this order.<a name="line.350"></a>
+<FONT color="green">351</FONT>         *  @return     the number of contracts.<a name="line.351"></a>
+<FONT color="green">352</FONT>         */<a name="line.352"></a>
+<FONT color="green">353</FONT>        public  Integer getNumberOfContracts() {<a name="line.353"></a>
+<FONT color="green">354</FONT>            return number;<a name="line.354"></a>
+<FONT color="green">355</FONT>        }<a name="line.355"></a>
+<FONT color="green">356</FONT>    <a name="line.356"></a>
+<FONT color="green">357</FONT>        /**<a name="line.357"></a>
+<FONT color="green">358</FONT>         *  Get the month of the commodity.<a name="line.358"></a>
+<FONT color="green">359</FONT>         *  @return     the month of the commodity<a name="line.359"></a>
+<FONT color="green">360</FONT>         */<a name="line.360"></a>
+<FONT color="green">361</FONT>        public  String getMonth() {<a name="line.361"></a>
+<FONT color="green">362</FONT>            return month;<a name="line.362"></a>
+<FONT color="green">363</FONT>        }<a name="line.363"></a>
+<FONT color="green">364</FONT>    <a name="line.364"></a>
+<FONT color="green">365</FONT>        /**<a name="line.365"></a>
+<FONT color="green">366</FONT>         *  Get the name of the commodity.<a name="line.366"></a>
+<FONT color="green">367</FONT>         *  @return     the name and exchange of the commodity<a name="line.367"></a>
+<FONT color="green">368</FONT>         */<a name="line.368"></a>
+<FONT color="green">369</FONT>        public  String getCommodityName() {<a name="line.369"></a>
+<FONT color="green">370</FONT>            return commodityName;<a name="line.370"></a>
+<FONT color="green">371</FONT>        }<a name="line.371"></a>
+<FONT color="green">372</FONT>    <a name="line.372"></a>
+<FONT color="green">373</FONT>        /**<a name="line.373"></a>
+<FONT color="green">374</FONT>         *  Get the desired price for this order.  If there is no desired<a name="line.374"></a>
+<FONT color="green">375</FONT>         *  price, then 0 is returned.<a name="line.375"></a>
+<FONT color="green">376</FONT>         *  @return     the desired price<a name="line.376"></a>
+<FONT color="green">377</FONT>         */<a name="line.377"></a>
+<FONT color="green">378</FONT>        public  Double getDesiredPrice() {<a name="line.378"></a>
+<FONT color="green">379</FONT>            return desiredPrice;<a name="line.379"></a>
+<FONT color="green">380</FONT>        }<a name="line.380"></a>
+<FONT color="green">381</FONT>    <a name="line.381"></a>
+<FONT color="green">382</FONT>        /**<a name="line.382"></a>
+<FONT color="green">383</FONT>         *  Get the stop price for this order.  If there is no stop price,<a name="line.383"></a>
+<FONT color="green">384</FONT>         *  then 0 is returned.<a name="line.384"></a>
+<FONT color="green">385</FONT>         *  @return     the stop price<a name="line.385"></a>
+<FONT color="green">386</FONT>         */<a name="line.386"></a>
+<FONT color="green">387</FONT>        public  Double getStopPrice() {<a name="line.387"></a>
+<FONT color="green">388</FONT>            return stopPrice;<a name="line.388"></a>
+<FONT color="green">389</FONT>        }<a name="line.389"></a>
+<FONT color="green">390</FONT>    <a name="line.390"></a>
+<FONT color="green">391</FONT>        /**<a name="line.391"></a>
+<FONT color="green">392</FONT>         *  Get the actual price the order was fullfilled at.  If there is<a name="line.392"></a>
+<FONT color="green">393</FONT>         *  no actual price, then 0 is returned.<a name="line.393"></a>
+<FONT color="green">394</FONT>         *  @return     the actual price<a name="line.394"></a>
+<FONT color="green">395</FONT>         */<a name="line.395"></a>
+<FONT color="green">396</FONT>        public  Double getActualPrice() {<a name="line.396"></a>
+<FONT color="green">397</FONT>            return actualPrice;<a name="line.397"></a>
+<FONT color="green">398</FONT>        }<a name="line.398"></a>
+<FONT color="green">399</FONT>    <a name="line.399"></a>
+<FONT color="green">400</FONT>        /**<a name="line.400"></a>
+<FONT color="green">401</FONT>         *  Get the status of this order.<a name="line.401"></a>
+<FONT color="green">402</FONT>         *  @return     the order's status<a name="line.402"></a>
+<FONT color="green">403</FONT>         */<a name="line.403"></a>
+<FONT color="green">404</FONT>        public  String getStatus() {<a name="line.404"></a>
+<FONT color="green">405</FONT>            try {<a name="line.405"></a>
+<FONT color="green">406</FONT>            if ("".equals(status)) {<a name="line.406"></a>
+<FONT color="green">407</FONT>                return " ";<a name="line.407"></a>
+<FONT color="green">408</FONT>            } else {<a name="line.408"></a>
+<FONT color="green">409</FONT>                return status;<a name="line.409"></a>
+<FONT color="green">410</FONT>            }<a name="line.410"></a>
+<FONT color="green">411</FONT>            } finally {<a name="line.411"></a>
+<FONT color="green">412</FONT>            }<a name="line.412"></a>
+<FONT color="green">413</FONT>        }<a name="line.413"></a>
+<FONT color="green">414</FONT>    <a name="line.414"></a>
+<FONT color="green">415</FONT>        /**<a name="line.415"></a>
+<FONT color="green">416</FONT>         *  Get the note for this order.<a name="line.416"></a>
+<FONT color="green">417</FONT>         *  @return     the note<a name="line.417"></a>
+<FONT color="green">418</FONT>         */<a name="line.418"></a>
+<FONT color="green">419</FONT>        public  String getNote() {<a name="line.419"></a>
+<FONT color="green">420</FONT>            return note;<a name="line.420"></a>
+<FONT color="green">421</FONT>        }<a name="line.421"></a>
+<FONT color="green">422</FONT>    <a name="line.422"></a>
+<FONT color="green">423</FONT>        /**<a name="line.423"></a>
+<FONT color="green">424</FONT>         *  Get the offsetting order that filled this one.  A returned<a name="line.424"></a>
+<FONT color="green">425</FONT>         *  value of -1 indicates that this order has not been filled.<a name="line.425"></a>
+<FONT color="green">426</FONT>         *  @return     the offsetting order number or -1 if none<a name="line.426"></a>
+<FONT color="green">427</FONT>         */<a name="line.427"></a>
+<FONT color="green">428</FONT>        public  long getOffsettingOrder() {<a name="line.428"></a>
+<FONT color="green">429</FONT>            return offsettingOrder;<a name="line.429"></a>
+<FONT color="green">430</FONT>        }<a name="line.430"></a>
+<FONT color="green">431</FONT>    <a name="line.431"></a>
+<FONT color="green">432</FONT>        /**<a name="line.432"></a>
+<FONT color="green">433</FONT>         *  Get the date the order was considered.  If the order has not<a name="line.433"></a>
+<FONT color="green">434</FONT>         *  been considered, null is returned.<a name="line.434"></a>
+<FONT color="green">435</FONT>         *  @return     the date the order was considered.<a name="line.435"></a>
+<FONT color="green">436</FONT>         */<a name="line.436"></a>
+<FONT color="green">437</FONT>        public  Date getDateConsidered() {<a name="line.437"></a>
+<FONT color="green">438</FONT>            return dateConsidered;<a name="line.438"></a>
+<FONT color="green">439</FONT>        }<a name="line.439"></a>
+<FONT color="green">440</FONT>    <a name="line.440"></a>
+<FONT color="green">441</FONT>        /**<a name="line.441"></a>
+<FONT color="green">442</FONT>         *  Get the date the order was placed.  If the order has not<a name="line.442"></a>
+<FONT color="green">443</FONT>         *  been placed, null is returned.<a name="line.443"></a>
+<FONT color="green">444</FONT>         *  @return     the date the order was placed.<a name="line.444"></a>
+<FONT color="green">445</FONT>         */<a name="line.445"></a>
+<FONT color="green">446</FONT>        public  Date getDatePlaced() {<a name="line.446"></a>
+<FONT color="green">447</FONT>            return datePlaced;<a name="line.447"></a>
+<FONT color="green">448</FONT>        }<a name="line.448"></a>
+<FONT color="green">449</FONT>    <a name="line.449"></a>
+<FONT color="green">450</FONT>        /**<a name="line.450"></a>
+<FONT color="green">451</FONT>         *  Get the date the order was filled.  If the order has not<a name="line.451"></a>
+<FONT color="green">452</FONT>         *  been filled, null is returned.<a name="line.452"></a>
+<FONT color="green">453</FONT>         *  @return     the date the order was filled.<a name="line.453"></a>
+<FONT color="green">454</FONT>         */<a name="line.454"></a>
+<FONT color="green">455</FONT>        public  Date getDateFilled() {<a name="line.455"></a>
+<FONT color="green">456</FONT>            return dateFilled;<a name="line.456"></a>
+<FONT color="green">457</FONT>        }<a name="line.457"></a>
+<FONT color="green">458</FONT>    <a name="line.458"></a>
+<FONT color="green">459</FONT>        /**<a name="line.459"></a>
+<FONT color="green">460</FONT>         *  Get the date the order had the cancel placed.  If the order has not<a name="line.460"></a>
+<FONT color="green">461</FONT>         *  had a cancel placed, null is returned.<a name="line.461"></a>
+<FONT color="green">462</FONT>         *  @return     the date the order had a cancel placed.<a name="line.462"></a>
+<FONT color="green">463</FONT>         */<a name="line.463"></a>
+<FONT color="green">464</FONT>        public  Date getDateCancelPlaced() {<a name="line.464"></a>
+<FONT color="green">465</FONT>            return dateCancelPlaced;<a name="line.465"></a>
+<FONT color="green">466</FONT>        }<a name="line.466"></a>
+<FONT color="green">467</FONT>    <a name="line.467"></a>
+<FONT color="green">468</FONT>        /**<a name="line.468"></a>
+<FONT color="green">469</FONT>         *  Get the date the order was cancelled.  If the order has not<a name="line.469"></a>
+<FONT color="green">470</FONT>         *  been cancelled, null is returned.<a name="line.470"></a>
+<FONT color="green">471</FONT>         *  @return     the date the order was cancelled.<a name="line.471"></a>
+<FONT color="green">472</FONT>         */<a name="line.472"></a>
+<FONT color="green">473</FONT>        public  Date getDateCancelled() {<a name="line.473"></a>
+<FONT color="green">474</FONT>            return dateCancelled;<a name="line.474"></a>
+<FONT color="green">475</FONT>        }<a name="line.475"></a>
+<FONT color="green">476</FONT>    <a name="line.476"></a>
+<FONT color="green">477</FONT>        /**<a name="line.477"></a>
+<FONT color="green">478</FONT>         *  Get the date the order had a stop loss.  If the order has not<a name="line.478"></a>
+<FONT color="green">479</FONT>         *  had a stop loss, null is returned.<a name="line.479"></a>
+<FONT color="green">480</FONT>         *  @return     the date the order had a stop loss.<a name="line.480"></a>
+<FONT color="green">481</FONT>         */<a name="line.481"></a>
+<FONT color="green">482</FONT>        public  Date getDateStopLoss() {<a name="line.482"></a>
+<FONT color="green">483</FONT>            return dateStopLoss;<a name="line.483"></a>
+<FONT color="green">484</FONT>        }<a name="line.484"></a>
+<FONT color="green">485</FONT>    <a name="line.485"></a>
+<FONT color="green">486</FONT>    <a name="line.486"></a>
+<FONT color="green">487</FONT>        /**<a name="line.487"></a>
+<FONT color="green">488</FONT>         *  Set the orders unique id.<a name="line.488"></a>
+<FONT color="green">489</FONT>         */<a name="line.489"></a>
+<FONT color="green">490</FONT>        private void setId() {<a name="line.490"></a>
+<FONT color="green">491</FONT>            if (index == -1) {<a name="line.491"></a>
+<FONT color="green">492</FONT>                try {<a name="line.492"></a>
+<FONT color="green">493</FONT>                    index = dataManager.getLastOrderIndex();<a name="line.493"></a>
+<FONT color="green">494</FONT>                } catch (IOException e) {<a name="line.494"></a>
+<FONT color="green">495</FONT>                    e.printStackTrace();<a name="line.495"></a>
+<FONT color="green">496</FONT>                }<a name="line.496"></a>
+<FONT color="green">497</FONT>            }<a name="line.497"></a>
+<FONT color="green">498</FONT>            id = ++index;<a name="line.498"></a>
+<FONT color="green">499</FONT>        }<a name="line.499"></a>
+<FONT color="green">500</FONT>    <a name="line.500"></a>
+<FONT color="green">501</FONT>    <a name="line.501"></a>
+<FONT color="green">502</FONT>        /**<a name="line.502"></a>
+<FONT color="green">503</FONT>         *  Sets the date the order was recorded as having taken place.<a name="line.503"></a>
+<FONT color="green">504</FONT>         *  @param  date    the date<a name="line.504"></a>
+<FONT color="green">505</FONT>         */<a name="line.505"></a>
+<FONT color="green">506</FONT>        public  void setDate (String date) {<a name="line.506"></a>
+<FONT color="green">507</FONT>            this.date = FormatDate.formatDateString(date, PropertyManager.instance().getProperties(PROPERTIES_FILE).getProperty(DATE_FORMAT));<a name="line.507"></a>
+<FONT color="green">508</FONT>        }<a name="line.508"></a>
+<FONT color="green">509</FONT>    <a name="line.509"></a>
+<FONT color="green">510</FONT>        /**<a name="line.510"></a>
+<FONT color="green">511</FONT>         *  Set the number of contracts in this order.<a name="line.511"></a>
+<FONT color="green">512</FONT>         *  @param  number  the number of contracts<a name="line.512"></a>
+<FONT color="green">513</FONT>         */<a name="line.513"></a>
+<FONT color="green">514</FONT>        public  void setNumberOfContracts(Integer number) {<a name="line.514"></a>
+<FONT color="green">515</FONT>            if (!this.number.equals(number)) {<a name="line.515"></a>
+<FONT color="green">516</FONT>                this.number = number;<a name="line.516"></a>
+<FONT color="green">517</FONT>                if (!ContractPanel.NO_STATUS.equals(status)) {<a name="line.517"></a>
+<FONT color="green">518</FONT>                    recordOrder();<a name="line.518"></a>
+<FONT color="green">519</FONT>                }<a name="line.519"></a>
+<FONT color="green">520</FONT>            }<a name="line.520"></a>
+<FONT color="green">521</FONT>        }<a name="line.521"></a>
+<FONT color="green">522</FONT>    <a name="line.522"></a>
+<FONT color="green">523</FONT>        /**<a name="line.523"></a>
+<FONT color="green">524</FONT>         *  Set the number of contracts in this order.<a name="line.524"></a>
+<FONT color="green">525</FONT>         *  @param  number  the number of contracts<a name="line.525"></a>
+<FONT color="green">526</FONT>         */<a name="line.526"></a>
+<FONT color="green">527</FONT>        public  void setNumberOfContracts(int number) {<a name="line.527"></a>
+<FONT color="green">528</FONT>            setNumberOfContracts(new Integer(number));<a name="line.528"></a>
+<FONT color="green">529</FONT>        }<a name="line.529"></a>
+<FONT color="green">530</FONT>    <a name="line.530"></a>
+<FONT color="green">531</FONT>        /**<a name="line.531"></a>
+<FONT color="green">532</FONT>         *  Set the month of the commodity.  This is in the format of the month<a name="line.532"></a>
+<FONT color="green">533</FONT>         *  abbreviation and year.<a name="line.533"></a>
+<FONT color="green">534</FONT>         *  @param  month   the month of the commodity<a name="line.534"></a>
+<FONT color="green">535</FONT>         */<a name="line.535"></a>
+<FONT color="green">536</FONT>        public  void setMonth(String month) {<a name="line.536"></a>
+<FONT color="green">537</FONT>            this.month = month.trim();<a name="line.537"></a>
+<FONT color="green">538</FONT>        }<a name="line.538"></a>
+<FONT color="green">539</FONT>    <a name="line.539"></a>
+<FONT color="green">540</FONT>        /**<a name="line.540"></a>
+<FONT color="green">541</FONT>         *  Set the commodity name, including exchange.<a name="line.541"></a>
+<FONT color="green">542</FONT>         *  @param  name    the name of the commodity and exchange<a name="line.542"></a>
+<FONT color="green">543</FONT>         */<a name="line.543"></a>
+<FONT color="green">544</FONT>        public  void setCommodityName(String name) {<a name="line.544"></a>
+<FONT color="green">545</FONT>            commodityName = name.trim();<a name="line.545"></a>
+<FONT color="green">546</FONT>        }<a name="line.546"></a>
+<FONT color="green">547</FONT>    <a name="line.547"></a>
+<FONT color="green">548</FONT>        /**<a name="line.548"></a>
+<FONT color="green">549</FONT>         *  Set the desired price for this order.<a name="line.549"></a>
+<FONT color="green">550</FONT>         *  @param  price   the desired price<a name="line.550"></a>
+<FONT color="green">551</FONT>         */<a name="line.551"></a>
+<FONT color="green">552</FONT>        public  void setDesiredPrice(Double price) {<a name="line.552"></a>
+<FONT color="green">553</FONT>            if (!desiredPrice.equals(price)) {<a name="line.553"></a>
+<FONT color="green">554</FONT>                desiredPrice = price;<a name="line.554"></a>
+<FONT color="green">555</FONT>                if (!ContractPanel.NO_STATUS.equals(status)) {<a name="line.555"></a>
+<FONT color="green">556</FONT>                    recordOrder();<a name="line.556"></a>
+<FONT color="green">557</FONT>                }<a name="line.557"></a>
+<FONT color="green">558</FONT>            }<a name="line.558"></a>
+<FONT color="green">559</FONT>        }<a name="line.559"></a>
+<FONT color="green">560</FONT>    <a name="line.560"></a>
+<FONT color="green">561</FONT>        /**<a name="line.561"></a>
+<FONT color="green">562</FONT>         *  Set the stop price for this order.<a name="line.562"></a>
+<FONT color="green">563</FONT>         *  @param  price   the stop price<a name="line.563"></a>
+<FONT color="green">564</FONT>         */<a name="line.564"></a>
+<FONT color="green">565</FONT>        public  void setStopPrice(Double price) {<a name="line.565"></a>
+<FONT color="green">566</FONT>            if (!stopPrice.equals(price)) {<a name="line.566"></a>
+<FONT color="green">567</FONT>                stopPrice = price;<a name="line.567"></a>
+<FONT color="green">568</FONT>                if (!ContractPanel.NO_STATUS.equals(status)) {<a name="line.568"></a>
+<FONT color="green">569</FONT>                    recordOrder();<a name="line.569"></a>
+<FONT color="green">570</FONT>                }<a name="line.570"></a>
+<FONT color="green">571</FONT>            }<a name="line.571"></a>
+<FONT color="green">572</FONT>        }<a name="line.572"></a>
+<FONT color="green">573</FONT>    <a name="line.573"></a>
+<FONT color="green">574</FONT>        /**<a name="line.574"></a>
+<FONT color="green">575</FONT>         *  Set the actual price for this order.<a name="line.575"></a>
+<FONT color="green">576</FONT>         *  @param  price   the actual price<a name="line.576"></a>
+<FONT color="green">577</FONT>         */<a name="line.577"></a>
+<FONT color="green">578</FONT>        public  void setActualPrice(Double price) {<a name="line.578"></a>
+<FONT color="green">579</FONT>            if (!actualPrice.equals(price)) {<a name="line.579"></a>
+<FONT color="green">580</FONT>                actualPrice = price;<a name="line.580"></a>
+<FONT color="green">581</FONT>                recordOrder();<a name="line.581"></a>
+<FONT color="green">582</FONT>            }<a name="line.582"></a>
+<FONT color="green">583</FONT>        }<a name="line.583"></a>
+<FONT color="green">584</FONT>    <a name="line.584"></a>
+<FONT color="green">585</FONT>        /**<a name="line.585"></a>
+<FONT color="green">586</FONT>         *  Set the status for this order.<a name="line.586"></a>
+<FONT color="green">587</FONT>         *  @param  status  the order's status<a name="line.587"></a>
+<FONT color="green">588</FONT>         */<a name="line.588"></a>
+<FONT color="green">589</FONT>        public  void setStatus(String status) {<a name="line.589"></a>
+<FONT color="green">590</FONT>            if (!this.status.equals(status)) {<a name="line.590"></a>
+<FONT color="green">591</FONT>                this.status = status;<a name="line.591"></a>
+<FONT color="green">592</FONT>                CommodityCalendar calendar = (CommodityCalendar)CommodityCalendar.getInstance();<a name="line.592"></a>
+<FONT color="green">593</FONT>                calendar.clearTime();<a name="line.593"></a>
+<FONT color="green">594</FONT>    <a name="line.594"></a>
+<FONT color="green">595</FONT>                if (ContractPanel.NO_STATUS.equals(status)) {<a name="line.595"></a>
+<FONT color="green">596</FONT>                    delete();<a name="line.596"></a>
+<FONT color="green">597</FONT>                } else if (ContractPanel.CONSIDERATION.equals(status)) {<a name="line.597"></a>
+<FONT color="green">598</FONT>                    dateConsidered = calendar.getTime();<a name="line.598"></a>
+<FONT color="green">599</FONT>                    datePlaced = null;<a name="line.599"></a>
+<FONT color="green">600</FONT>                    offsettingOrder = -1;<a name="line.600"></a>
+<FONT color="green">601</FONT>                    recordOrder();<a name="line.601"></a>
+<FONT color="green">602</FONT>                } else if (ContractPanel.PLACED.equals(status)) {<a name="line.602"></a>
+<FONT color="green">603</FONT>                    datePlaced = calendar.getTime();<a name="line.603"></a>
+<FONT color="green">604</FONT>                    dateFilled = null;<a name="line.604"></a>
+<FONT color="green">605</FONT>                    offsettingOrder = -1;<a name="line.605"></a>
+<FONT color="green">606</FONT>                    recordOrder();<a name="line.606"></a>
+<FONT color="green">607</FONT>                } else if (ContractPanel.FILLED.equals(status)) {<a name="line.607"></a>
+<FONT color="green">608</FONT>                    dateFilled = calendar.getTime();<a name="line.608"></a>
+<FONT color="green">609</FONT>                    dateCancelled = null;<a name="line.609"></a>
+<FONT color="green">610</FONT>                    dateStopLoss = null;<a name="line.610"></a>
+<FONT color="green">611</FONT>                    recordOrder();<a name="line.611"></a>
+<FONT color="green">612</FONT>                } else if (ContractPanel.CANCEL_PLACED.equals(status)) {<a name="line.612"></a>
+<FONT color="green">613</FONT>                    dateCancelPlaced = calendar.getTime();<a name="line.613"></a>
+<FONT color="green">614</FONT>                    dateFilled = null;<a name="line.614"></a>
+<FONT color="green">615</FONT>                    dateCancelled = null;<a name="line.615"></a>
+<FONT color="green">616</FONT>                    offsettingOrder = -1;<a name="line.616"></a>
+<FONT color="green">617</FONT>                    recordOrder();<a name="line.617"></a>
+<FONT color="green">618</FONT>                } else if (ContractPanel.CANCELLED.equals(status)) {<a name="line.618"></a>
+<FONT color="green">619</FONT>                    dateCancelled = calendar.getTime();<a name="line.619"></a>
+<FONT color="green">620</FONT>                    dateFilled = null;<a name="line.620"></a>
+<FONT color="green">621</FONT>                    offsettingOrder = -1;<a name="line.621"></a>
+<FONT color="green">622</FONT>                    recordOrder();<a name="line.622"></a>
+<FONT color="green">623</FONT>                } else if (ContractPanel.STOP_LOSS.equals(status)) {<a name="line.623"></a>
+<FONT color="green">624</FONT>                    dateStopLoss = calendar.getTime();<a name="line.624"></a>
+<FONT color="green">625</FONT>                    recordOrder();<a name="line.625"></a>
+<FONT color="green">626</FONT>                }<a name="line.626"></a>
+<FONT color="green">627</FONT>            }<a name="line.627"></a>
+<FONT color="green">628</FONT>        }<a name="line.628"></a>
+<FONT color="green">629</FONT>    <a name="line.629"></a>
+<FONT color="green">630</FONT>        /**<a name="line.630"></a>
+<FONT color="green">631</FONT>         *  Set the note.<a name="line.631"></a>
+<FONT color="green">632</FONT>         *  @param  note    the note<a name="line.632"></a>
+<FONT color="green">633</FONT>         */<a name="line.633"></a>
+<FONT color="green">634</FONT>        public  void setNote(String note) {<a name="line.634"></a>
+<FONT color="green">635</FONT>            if (!this.note.equals(note.trim())) {<a name="line.635"></a>
+<FONT color="green">636</FONT>                this.note = note.trim();<a name="line.636"></a>
+<FONT color="green">637</FONT>                if (!ContractPanel.NO_STATUS.equals(status)) {<a name="line.637"></a>
+<FONT color="green">638</FONT>                    recordOrder();<a name="line.638"></a>
+<FONT color="green">639</FONT>                }<a name="line.639"></a>
+<FONT color="green">640</FONT>            }<a name="line.640"></a>
+<FONT color="green">641</FONT>        }<a name="line.641"></a>
+<FONT color="green">642</FONT>    <a name="line.642"></a>
+<FONT color="green">643</FONT>        /**<a name="line.643"></a>
+<FONT color="green">644</FONT>         *  set the offsetting order that filled this one.<a name="line.644"></a>
+<FONT color="green">645</FONT>         *  @param  offsettingOrder     the offsetting order number<a name="line.645"></a>
+<FONT color="green">646</FONT>         */<a name="line.646"></a>
+<FONT color="green">647</FONT>        public  void setOffsettingOrder(long offsettingOrder) {<a name="line.647"></a>
+<FONT color="green">648</FONT>            this.offsettingOrder = offsettingOrder;<a name="line.648"></a>
+<FONT color="green">649</FONT>            recordOrder();<a name="line.649"></a>
+<FONT color="green">650</FONT>        }<a name="line.650"></a>
+<FONT color="green">651</FONT>    <a name="line.651"></a>
+<FONT color="green">652</FONT>    <a name="line.652"></a>
+<FONT color="green">653</FONT>    /* *************************************** */<a name="line.653"></a>
+<FONT color="green">654</FONT>    /* *** INSTANCE METHODS                *** */<a name="line.654"></a>
+<FONT color="green">655</FONT>    /* *************************************** */<a name="line.655"></a>
+<FONT color="green">656</FONT>    <a name="line.656"></a>
+<FONT color="green">657</FONT>        /**<a name="line.657"></a>
+<FONT color="green">658</FONT>         *  Indicates if this order is equal to another order.  Equal, in this<a name="line.658"></a>
+<FONT color="green">659</FONT>         *  case, indicates that the orders have the same account number, order type,<a name="line.659"></a>
+<FONT color="green">660</FONT>         *  initial date, contract, desired price, stoploss price, status, and actual price.<a name="line.660"></a>
+<FONT color="green">661</FONT>         *  It does not include the number of contracts.<a name="line.661"></a>
+<FONT color="green">662</FONT>         *<a name="line.662"></a>
+<FONT color="green">663</FONT>         *  @param  toOrder     the order to compare this one to<a name="line.663"></a>
+<FONT color="green">664</FONT>         */<a name="line.664"></a>
+<FONT color="green">665</FONT>        public boolean equals(ContractOrder toOrder) {<a name="line.665"></a>
+<FONT color="green">666</FONT>            if (acctNumber == toOrder.getAccountNumber() &&<a name="line.666"></a>
+<FONT color="green">667</FONT>                orderType == toOrder.isLongOrder() &&<a name="line.667"></a>
+<FONT color="green">668</FONT>                date.equals(toOrder.getDate()) &&<a name="line.668"></a>
+<FONT color="green">669</FONT>                month.equals(toOrder.getMonth()) &&<a name="line.669"></a>
+<FONT color="green">670</FONT>                commodityName.equals(toOrder.getCommodityName()) &&<a name="line.670"></a>
+<FONT color="green">671</FONT>                desiredPrice.equals(toOrder.getDesiredPrice()) &&<a name="line.671"></a>
+<FONT color="green">672</FONT>                stopPrice.equals(toOrder.getStopPrice()) &&<a name="line.672"></a>
+<FONT color="green">673</FONT>                actualPrice.equals(toOrder.getActualPrice()) &&<a name="line.673"></a>
+<FONT color="green">674</FONT>                status.equals(toOrder.getStatus())) {<a name="line.674"></a>
+<FONT color="green">675</FONT>                return true;<a name="line.675"></a>
+<FONT color="green">676</FONT>            } else {<a name="line.676"></a>
+<FONT color="green">677</FONT>                return false;<a name="line.677"></a>
+<FONT color="green">678</FONT>            }<a name="line.678"></a>
+<FONT color="green">679</FONT>        }<a name="line.679"></a>
+<FONT color="green">680</FONT>    <a name="line.680"></a>
+<FONT color="green">681</FONT>        /**<a name="line.681"></a>
+<FONT color="green">682</FONT>         *  Creates a new order with the requested number of contracts<a name="line.682"></a>
+<FONT color="green">683</FONT>         *  in the new order and deducted from the original order.  If<a name="line.683"></a>
+<FONT color="green">684</FONT>         *  the number of contracts in the new order is not less than<a name="line.684"></a>
+<FONT color="green">685</FONT>         *  the original order, then a null order is returned and the<a name="line.685"></a>
+<FONT color="green">686</FONT>         *  original order remains unchanged.<a name="line.686"></a>
+<FONT color="green">687</FONT>         *<a name="line.687"></a>
+<FONT color="green">688</FONT>         *  @param  numberInNew     number of contracts in new order<a name="line.688"></a>
+<FONT color="green">689</FONT>         */<a name="line.689"></a>
+<FONT color="green">690</FONT>        public ContractOrder split(int numberInNew) {<a name="line.690"></a>
+<FONT color="green">691</FONT>            ContractOrder order = null;<a name="line.691"></a>
+<FONT color="green">692</FONT>            if (numberInNew >= number.intValue()) {<a name="line.692"></a>
+<FONT color="green">693</FONT>                return null;<a name="line.693"></a>
+<FONT color="green">694</FONT>            }<a name="line.694"></a>
+<FONT color="green">695</FONT>            number = new Integer(number.intValue() - numberInNew);<a name="line.695"></a>
+<FONT color="green">696</FONT>            recordOrder();<a name="line.696"></a>
+<FONT color="green">697</FONT>            order = new ContractOrder(-1,<a name="line.697"></a>
+<FONT color="green">698</FONT>                                      acctNumber,<a name="line.698"></a>
+<FONT color="green">699</FONT>                                      orderType,<a name="line.699"></a>
+<FONT color="green">700</FONT>                                      date,<a name="line.700"></a>
+<FONT color="green">701</FONT>                                      new Integer(numberInNew),<a name="line.701"></a>
+<FONT color="green">702</FONT>                                      month,<a name="line.702"></a>
+<FONT color="green">703</FONT>                                      commodityName,<a name="line.703"></a>
+<FONT color="green">704</FONT>                                      desiredPrice,<a name="line.704"></a>
+<FONT color="green">705</FONT>                                      stopPrice,<a name="line.705"></a>
+<FONT color="green">706</FONT>                                      status,<a name="line.706"></a>
+<FONT color="green">707</FONT>                                      actualPrice,<a name="line.707"></a>
+<FONT color="green">708</FONT>                                      note,<a name="line.708"></a>
+<FONT color="green">709</FONT>                                      -1,<a name="line.709"></a>
+<FONT color="green">710</FONT>                                      dateConsidered,<a name="line.710"></a>
+<FONT color="green">711</FONT>                                      datePlaced,<a name="line.711"></a>
+<FONT color="green">712</FONT>                                      dateFilled,<a name="line.712"></a>
+<FONT color="green">713</FONT>                                      dateCancelPlaced,<a name="line.713"></a>
+<FONT color="green">714</FONT>                                      dateCancelled,<a name="line.714"></a>
+<FONT color="green">715</FONT>                                      dateStopLoss);<a name="line.715"></a>
+<FONT color="green">716</FONT>            return order;<a name="line.716"></a>
+<FONT color="green">717</FONT>        }<a name="line.717"></a>
+<FONT color="green">718</FONT>    <a name="line.718"></a>
+<FONT color="green">719</FONT>        /**<a name="line.719"></a>
+<FONT color="green">720</FONT>         *  Combines the addOrder with this order.  All dates fields are<a name="line.720"></a>
+<FONT color="green">721</FONT>         *  updated with the most current date between the two orders.<a name="line.721"></a>
+<FONT color="green">722</FONT>         *  The addOrder is also deleted.<a name="line.722"></a>
+<FONT color="green">723</FONT>         *<a name="line.723"></a>
+<FONT color="green">724</FONT>         *  @param  addOrder    the order to be added into this order<a name="line.724"></a>
+<FONT color="green">725</FONT>         *  @return             true if the combine was successful<a name="line.725"></a>
+<FONT color="green">726</FONT>         */<a name="line.726"></a>
+<FONT color="green">727</FONT>        public boolean combine(ContractOrder addOrder) {<a name="line.727"></a>
+<FONT color="green">728</FONT>            if ((addOrder == null) ||<a name="line.728"></a>
+<FONT color="green">729</FONT>                !this.equals(addOrder) ||<a name="line.729"></a>
+<FONT color="green">730</FONT>                (addOrder.getNumberOfContracts().intValue() &lt;= 0)) {<a name="line.730"></a>
+<FONT color="green">731</FONT>                return false;<a name="line.731"></a>
+<FONT color="green">732</FONT>            }<a name="line.732"></a>
+<FONT color="green">733</FONT>    <a name="line.733"></a>
+<FONT color="green">734</FONT>            number = new Integer(number.intValue() + addOrder.getNumberOfContracts().intValue());<a name="line.734"></a>
+<FONT color="green">735</FONT>    <a name="line.735"></a>
+<FONT color="green">736</FONT>            dateConsidered  = (dateConsidered == null || dateConsidered.compareTo(addOrder.getDateConsidered()) &lt; 0)?addOrder.getDateConsidered():dateConsidered;<a name="line.736"></a>
+<FONT color="green">737</FONT>            datePlaced      = (datePlaced== null || datePlaced.compareTo(addOrder.getDatePlaced()) &lt; 0)?addOrder.getDatePlaced():datePlaced;<a name="line.737"></a>
+<FONT color="green">738</FONT>            dateFilled      = (dateFilled == null || dateFilled.compareTo(addOrder.getDateFilled()) &lt; 0)?addOrder.getDateFilled():dateFilled;<a name="line.738"></a>
+<FONT color="green">739</FONT>            dateCancelPlaced = (dateCancelPlaced == null || dateCancelPlaced.compareTo(addOrder.getDateCancelPlaced()) &lt; 0)?addOrder.getDateCancelPlaced():dateCancelPlaced;<a name="line.739"></a>
+<FONT color="green">740</FONT>            dateCancelled   = (dateCancelled == null || dateCancelled.compareTo(addOrder.getDateCancelled()) &lt; 0)?addOrder.getDateCancelled():dateCancelled;<a name="line.740"></a>
+<FONT color="green">741</FONT>            dateStopLoss    = (dateStopLoss == null || dateStopLoss.compareTo(addOrder.getDateStopLoss()) &lt; 0)?addOrder.getDateStopLoss():dateStopLoss;<a name="line.741"></a>
+<FONT color="green">742</FONT>    <a name="line.742"></a>
+<FONT color="green">743</FONT>            recordOrder();<a name="line.743"></a>
+<FONT color="green">744</FONT>            addOrder.delete();<a name="line.744"></a>
+<FONT color="green">745</FONT>            return true;<a name="line.745"></a>
+<FONT color="green">746</FONT>        }<a name="line.746"></a>
+<FONT color="green">747</FONT>    <a name="line.747"></a>
+<FONT color="green">748</FONT>       /**<a name="line.748"></a>
+<FONT color="green">749</FONT>         *  Deletes an order from the database.  This is usually from combining orders.<a name="line.749"></a>
+<FONT color="green">750</FONT>         */<a name="line.750"></a>
+<FONT color="green">751</FONT>        public void delete() {<a name="line.751"></a>
+<FONT color="green">752</FONT>    //        if (!ContractPanel.NO_STATUS.equals(status)) {<a name="line.752"></a>
+<FONT color="green">753</FONT>                try {<a name="line.753"></a>
+<FONT color="green">754</FONT>                    dataManager.deleteOrderEntry(id);<a name="line.754"></a>
+<FONT color="green">755</FONT>                } catch (IOException e) {<a name="line.755"></a>
+<FONT color="green">756</FONT>                    e.printStackTrace();<a name="line.756"></a>
+<FONT color="green">757</FONT>                }<a name="line.757"></a>
+<FONT color="green">758</FONT>    //        }<a name="line.758"></a>
+<FONT color="green">759</FONT>    <a name="line.759"></a>
+<FONT color="green">760</FONT>    //        id                  = -1;<a name="line.760"></a>
+<FONT color="green">761</FONT>    //        orderType           = false;<a name="line.761"></a>
+<FONT color="green">762</FONT>            CommodityCalendar calendar = (CommodityCalendar)CommodityCalendar.getInstance();<a name="line.762"></a>
+<FONT color="green">763</FONT>            calendar.clearTime();<a name="line.763"></a>
+<FONT color="green">764</FONT>            date                = calendar.getTime();<a name="line.764"></a>
+<FONT color="green">765</FONT>            number              = new Integer(0);<a name="line.765"></a>
+<FONT color="green">766</FONT>    //        month               = "";<a name="line.766"></a>
+<FONT color="green">767</FONT>    //        commodityName       = "";<a name="line.767"></a>
+<FONT color="green">768</FONT>            desiredPrice        = new Double(0);<a name="line.768"></a>
+<FONT color="green">769</FONT>            stopPrice           = new Double(0);<a name="line.769"></a>
+<FONT color="green">770</FONT>            status              = ContractPanel.NO_STATUS;<a name="line.770"></a>
+<FONT color="green">771</FONT>            actualPrice         = new Double(0);<a name="line.771"></a>
+<FONT color="green">772</FONT>            note                = "";<a name="line.772"></a>
+<FONT color="green">773</FONT>            offsettingOrder     = -1;<a name="line.773"></a>
+<FONT color="green">774</FONT>            dateConsidered      = null;<a name="line.774"></a>
+<FONT color="green">775</FONT>            datePlaced          = null;<a name="line.775"></a>
+<FONT color="green">776</FONT>            dateFilled          = null;<a name="line.776"></a>
+<FONT color="green">777</FONT>            dateCancelPlaced    = null;<a name="line.777"></a>
+<FONT color="green">778</FONT>            dateCancelled       = null;<a name="line.778"></a>
+<FONT color="green">779</FONT>            dateStopLoss        = null;<a name="line.779"></a>
+<FONT color="green">780</FONT>        }<a name="line.780"></a>
+<FONT color="green">781</FONT>    <a name="line.781"></a>
+<FONT color="green">782</FONT>        /**<a name="line.782"></a>
+<FONT color="green">783</FONT>         *  Record the current state of the order.<a name="line.783"></a>
+<FONT color="green">784</FONT>         */<a name="line.784"></a>
+<FONT color="green">785</FONT>        private void recordOrder() {<a name="line.785"></a>
+<FONT color="green">786</FONT>            try {<a name="line.786"></a>
+<FONT color="green">787</FONT>                dataManager.updateOrderEntry(id,<a name="line.787"></a>
+<FONT color="green">788</FONT>                                             acctNumber,<a name="line.788"></a>
+<FONT color="green">789</FONT>                                             orderType,<a name="line.789"></a>
+<FONT color="green">790</FONT>                                             date,<a name="line.790"></a>
+<FONT color="green">791</FONT>                                             number,<a name="line.791"></a>
+<FONT color="green">792</FONT>                                             month,<a name="line.792"></a>
+<FONT color="green">793</FONT>                                             commodityName,<a name="line.793"></a>
+<FONT color="green">794</FONT>                                             desiredPrice,<a name="line.794"></a>
+<FONT color="green">795</FONT>                                             stopPrice,<a name="line.795"></a>
+<FONT color="green">796</FONT>                                             status,<a name="line.796"></a>
+<FONT color="green">797</FONT>                                             actualPrice,<a name="line.797"></a>
+<FONT color="green">798</FONT>                                             note,<a name="line.798"></a>
+<FONT color="green">799</FONT>                                             offsettingOrder,<a name="line.799"></a>
+<FONT color="green">800</FONT>                                             dateConsidered,<a name="line.800"></a>
+<FONT color="green">801</FONT>                                             datePlaced,<a name="line.801"></a>
+<FONT color="green">802</FONT>                                             dateFilled,<a name="line.802"></a>
+<FONT color="green">803</FONT>                                             dateCancelPlaced,<a name="line.803"></a>
+<FONT color="green">804</FONT>                                             dateCancelled,<a name="line.804"></a>
+<FONT color="green">805</FONT>                                             dateStopLoss);<a name="line.805"></a>
+<FONT color="green">806</FONT>            } catch (IOException e) {<a name="line.806"></a>
+<FONT color="green">807</FONT>                e.printStackTrace();<a name="line.807"></a>
+<FONT color="green">808</FONT>            }<a name="line.808"></a>
+<FONT color="green">809</FONT>        }<a name="line.809"></a>
+<FONT color="green">810</FONT>    }<a name="line.810"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

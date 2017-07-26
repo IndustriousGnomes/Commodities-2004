@@ -1,0 +1,15 @@
+User_Id	page	loc	symbol	title
+1	0	0	S   	Grains
+1	0	1	SM  	Grains
+1	0	2	BO  	Grains
+1	0	3	C   	Grains
+1	0	4	W   	Grains
+1	0	5	O	Grains
+1	0	6	RR	Grains
+1	1	0	RR  	Misc
+1	1	1	O	Misc
+1	2	0	YG  	Mini Contracts
+1	2	1	YI  	Mini Contracts
+1	2	2	YK  	Mini Contracts
+1	2	3	YC  	Mini Contracts
+1	2	4	YW  	Mini Contracts

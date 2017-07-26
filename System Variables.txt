@@ -1,0 +1,20 @@
+COMMODITY_SOURCES
+%COMMODITIES_HOME%\src\commodities\*.java   %COMMODITIES_HOME%\src\commodities\account\*.java   %COMMODITIES_HOME%\src\commodities\commodity\*.java   %COMMODITIES_HOME%\src\commodities\contract\*.java   %COMMODITIES_HOME%\src\commodities\dataaccess\*.java   %COMMODITIES_HOME%\src\commodities\dataaccess\database\*.java   %COMMODITIES_HOME%\src\commodities\dataaccess\dataloader\*.java   %COMMODITIES_HOME%\src\commodities\event\*.java   %COMMODITIES_HOME%\src\commodities\graph\*.java   %COMMODITIES_HOME%\src\commodities\menu\*.java   %COMMODITIES_HOME%\src\commodities\order\*.java   %COMMODITIES_HOME%\src\commodities\price\*.java   %COMMODITIES_HOME%\src\commodities\simulator\*.java   %COMMODITIES_HOME%\src\commodities\tests\*.java   %COMMODITIES_HOME%\src\commodities\tests\technical\*.java   %COMMODITIES_HOME%\src\commodities\util\*.java   %COMMODITIES_HOME%\src\commodities\window\*.java
+
+UTILITY_SOURCES
+%UTILITY_HOME%\src\com\awt\*.java  %UTILITY_HOME%\src\com\lang\*.java  %UTILITY_HOME%\src\com\util\*.java
+
+
+
+
+CLASSPATH
+.;%UTILITY_HOME%\exec;%COMMODITIES_HOME%\exec;%DEBUG_HOME%\exec;%JAVA_HOME%\jre\lib\ext\mysql-connector-java-3.0.16-ga-bin.jar
+
+COMMODITIES_HOME
+c:\JavaProjects\Commodities
+
+JAVA_HOME
+C:\java\j2sdk1.4.2_03
+
+UTILITY_HOME
+c:\JavaProjects\Utilities

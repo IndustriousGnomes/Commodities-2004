@@ -1,0 +1,131 @@
+package id1bpleczp1oohpczp2br5t;
+
+/**
+@version 2.0
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node32:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}/**
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference37 {
+}/**
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node26:oiref><oihard>
+@__modelType reference 
+*/
+class reference38 {
+}/**
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node30:oiref><oihard>
+@__modelType reference 
+*/
+class reference39 {
+}/**
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node28:oiref><oihard>
+@__modelType reference 
+*/
+class reference40 {
+}}/**
+This diagram displays the use cases required when maintaining commodity contract information.
+@__tags
+@shapeType UseCaseDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions 
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node26:oiref>=551,91,236,45,1:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node.link41:oiref>=444,216,541,216:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node32.link:oiref>=110,217,172,217:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node32:oiref>=45,177,65,77,1:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node30:oiref>=540,294,258,45,1:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node.link:oiref>=308,195,669,136:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node28:oiref>=541,192,263,45,1:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node:oiref>=172,195,272,45,1:oigroup>
+<oigroup:<oiref:design#Class#id1bpleczp1oohpczp2br5t.node.link42:oiref>=308,240,669,294:oigroup>
+*/
+class __positions {
+}/**
+The speculator is the person(s) that is using this tool to analyze the commodities market and makes investment decisions on the data/recommendations obtained.
+@shapeType Actor
+@__modelType node
+@name Speculator*/
+class node32 {
+/**
+@shapeType CommunicatesLink
+@__modelType link
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Maintain Commodity Contract Info
+@preconditions 1. Current commodity contract information must be obtained from the broker.
+@postconditions 1. Commodity may be analyzed within the application.
+@normalFlow 1. Select an add, update, or delete function to perform on this commodity contract. 
+*/
+class node {
+/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node26:oiref><oihard> 
+*/
+class link {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node28:oiref><oihard> 
+*/
+class link41 {
+}/**
+@shapeType IncludesLink
+@__modelType link
+@__ref <oiref:design#Class#id1bpleczp1oohpczp2br5t.node30:oiref><oihard> 
+*/
+class link42 {
+}}/**
+@shapeType UseCase
+@__modelType node
+@name Add Commodity Contract Info 
+@preconditions 1. Current commodity contract information must be obtained from the broker.
+@postconditions 1. Commodity is added to the list of commodities available to be analyzed by this system.
+@normalFlow 1. Speculator requests to maintain the commodity contract information.
+2. Speculator requests to add a new set of commodity contract information.
+3. Speculator enters the commodity contract information.
+4. Speculator verifies the information and submits it.
+*/
+class node26 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Delete Commodity Contract Info 
+@preconditions 1. Current commodity contract information must be obtained from the broker.
+@postconditions 1. Commodity is removed from the list of commodities available to be analyzed by this system.
+@normalFlow 1. Speculator requests to maintain the commodity contract information.
+2. Speculator requests to remove an old set of commodity contract information.
+3. Speculator removes the commodity contract information.
+4. Speculator verifies the information and submits it.
+*/
+class node30 {
+}/**
+@shapeType UseCase
+@__modelType node
+@name Update Commodity Contract Info 
+@preconditions 1. Current commodity contract information must be obtained from the broker.
+@postconditions 1. Commodity is updated in the list of commodities available to be analyzed by this system.
+@normalFlow 1. Speculator requests to maintain the commodity contract information.
+2. Speculator requests to update an existing set of commodity contract information.
+3. Speculator enters the new commodity contract information.
+4. Speculator verifies the information and submits it.
+*/
+class node28 {
+}

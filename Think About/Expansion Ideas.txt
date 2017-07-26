@@ -1,0 +1,20 @@
+Ideas For The Future
+====================
+
+Overall
+--------------
+- Modify program to allow distributed execution or self contained.
+
+Contract Panel
+--------------
+- Add a column that shows what the current value of each line is worth.  This would either be an actual value from 2 filled transactions or a paper value for a single filled transaction.  This will help determine the profit/loss that is currently in place based on the current market.
+
+- Add an area to indicate the running amount of funds in the account.
+
+- Allow for multiple accounts.
+
+- Market orders
+
+Tests
+--------------
+- Make tests capable of being told what collection of values to take in to be tested.  For instance, moving averages can happen on other statistical data besides prices such as the stochastic tests.

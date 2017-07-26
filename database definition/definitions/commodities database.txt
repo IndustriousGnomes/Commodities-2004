@@ -1,0 +1,141 @@
+#EXIT
+#########################################
+# THIS SHOULD ONLY BE PERFORMED ONCE IN #
+# THE LIFE OF THE COMMODITIES ANALYZER  #
+#########################################
+
+#DROP DATABASE IF EXISTS commodities;
+CREATE DATABASE IF NOT EXISTS commodities;
+USE commodities;
+
+#DROP TABLE IF EXISTS account;
+#DROP TABLE IF EXISTS commodity;
+#DROP TABLE IF EXISTS commodity_price_pages;
+#DROP TABLE IF EXISTS contract;
+#DROP TABLE IF EXISTS daily_prices;
+#DROP TABLE IF EXISTS month_lookup;
+#DROP TABLE IF EXISTS orders;
+#DROP TABLE IF EXISTS test_xref;
+
+CREATE TABLE IF NOT EXISTS account
+    (id         INT             AUTO_INCREMENT  PRIMARY KEY COMMENT 'Unique account number',
+     first_name VARCHAR(25)     NULL                        COMMENT 'The first name of the account holder',
+     last_name  VARCHAR(50)     NOT NULL                    COMMENT 'The last name (or company name) of the account holder',
+     capital    DECIMAL(10,2)   DEFAULT 0.0                 COMMENT 'The amount of capital given to the account'
+    );
+
+CREATE TABLE IF NOT EXISTS commodity
+    (id                         VARCHAR(4)  NOT NULL    PRIMARY KEY         COMMENT 'Unique Ticker Symbol',
+     exchange                   VARCHAR(10) NOT NULL                        COMMENT 'The exchange the commodity is traded on',
+     name                       VARCHAR(20) NOT NULL                        COMMENT 'Name of the commodity',
+     unit_type                  VARCHAR(10) NOT NULL    DEFAULT 'UNKNOWN'   COMMENT 'The type of units the contract is traded in',
+     unit_size                  INT         NOT NULL    DEFAULT 0           COMMENT 'The number of units wihtin a contract',
+     unit_price                 VARCHAR(10) NOT NULL                        COMMENT 'How the price is recorded per unit',
+     tick_size                  DECIMAL(10,4) NOT NULL  DEFAULT 0           COMMENT 'The minimum move size for a unit',
+     tick_price                 DECIMAL(10,2) NOT NULL  DEFAULT 0           COMMENT 'The price of a tick',
+     tick_daily_limit           INT         NOT NULL    DEFAULT 0           COMMENT 'Maximum number of ticks per day',
+     contract_standard_price    INT         NOT NULL    DEFAULT 0           COMMENT 'Standard price of a contract',
+     display_decimals           INT         NOT NULL    DEFAULT 0           COMMENT 'The number of decimals to display for the current price',
+     open_outcry_symbol         VARCHAR(4)  NULL                            COMMENT 'Symbol used on the floor and in tickers',
+     acm_symbol                 VARCHAR(25) NULL                            COMMENT 'Symbol used by electronic trading',
+     trade_month_mask           INT         NULL        DEFAULT 0           COMMENT 'Mask to use for month traded in.  January is in the right most bit',
+     last_trade_day             INT         NULL        DEFAULT 15          COMMENT 'Day of month of the last trading day of the current contract',
+     database_symbol            VARCHAR(10) NOT NULL                        COMMENT 'Alternate symbol used in database lookups at the exchange',
+     inactive                   INT         NULL        DEFAULT 0           COMMENT 'Inactivate the commodity (1)'
+    );
+
+CREATE TABLE IF NOT EXISTS commodity_price_pages
+    (user_id    INT          NOT NULL   DEFAULT 1       COMMENT 'The user id of who logged in',
+     page       INT          NOT NULL                   COMMENT '',
+     loc        INT          NOT NULL                   COMMENT '',
+     symbol     VARCHAR(4)   NOT NULL                   COMMENT '',
+     title      VARCHAR(15)  NOT NULL                   COMMENT 'Title of the tab to be displayed',
+     PRIMARY KEY (page, loc)
+    );
+
+CREATE TABLE IF NOT EXISTS contract
+    (commodity_id       VARCHAR(4)  NOT NULL            COMMENT 'The ID from the commodity table',
+     contract_sort      VARCHAR(10) NOT NULL            COMMENT 'The month and year of the contract',
+     contract_month     VARCHAR(10) NOT NULL            COMMENT 'The month and year of the contract',
+     id                 INT         AUTO_INCREMENT      COMMENT 'Unique id for this contract',
+     price              INT         NULL                COMMENT 'The cost of the contract',
+     inactive           INT         NULL    DEFAULT 0   COMMENT 'Inactivate the commodity (1)',
+     PRIMARY KEY (commodity_id, contract_sort),
+     KEY (id)
+    );
+
+CREATE TABLE IF NOT EXISTS daily_prices
+    (contract_id    INT             NOT NULL        COMMENT 'The id of the contract',
+     price_date     DATE            NOT NULL        COMMENT 'Date of the price',
+     open_tick      DECIMAL(10,4)   NOT NULL        COMMENT '',
+     high_tick      DECIMAL(10,4)   NOT NULL        COMMENT '',
+     low_tick       DECIMAL(10,4)   NOT NULL        COMMENT '',
+     close_tick     DECIMAL(10,4)   NOT NULL        COMMENT '',
+     volume         INT             NOT NULL        COMMENT '',
+     open_interest  INT             NOT NULL        COMMENT '',
+     PRIMARY KEY (contract_id, price_date)
+    );
+
+CREATE TABLE IF NOT EXISTS month_lookup
+    (name       VARCHAR(10)  NOT NULL       COMMENT '',
+     abbrev     VARCHAR(3)   NOT NULL       COMMENT '',
+     number     INT          NOT NULL       COMMENT '',
+     symbol     VARCHAR(1)   NOT NULL       COMMENT '',
+     PRIMARY KEY (number)
+    );
+
+CREATE TABLE IF NOT EXISTS orders
+    (id                 INT             NOT NULL                COMMENT 'Unique identifier of this order',
+     user_id            INT             NOT NULL    DEFAULT 1   COMMENT 'The user id of who is logged in',
+     account_id         INT             NOT NULL                COMMENT 'The account id of the client',
+     buy_sell_ind       VARCHAR(1)      NOT NULL                COMMENT 'B or S for buy or sell order',
+     date_entered       DATETIME        NOT NULL                COMMENT 'Date the order was recorded for',
+     nbr_contracts      INT             NOT NULL                COMMENT 'The number of contracts in the order',
+     contract_month     VARCHAR(10)     NOT NULL                COMMENT 'The contract month in "MMM YY" format',
+     commodity_name     VARCHAR(50)     NOT NULL                COMMENT 'Name and exchange of the commodity',
+     desired_price      DECIMAL(10,4)   NOT NULL                COMMENT 'The price that was requested',
+     stop_price         DECIMAL(10,4)   NULL                    COMMENT 'The stop order price for this order',
+     good_til           INT             NULL                    COMMENT 'The good til indicator for this order',
+     status             VARCHAR(20)     NOT NULL                COMMENT 'The current status of the order',
+     actual_price       DECIMAL(10,4)   NULL                    COMMENT 'The price the order was filled at',
+     ticket             VARCHAR(10)     NULL                    COMMENT 'The ticket number of the placed order',
+     note_text          VARCHAR(50)     NULL                    COMMENT '',
+     offsetting_order   INT             NULL        DEFAULT -1  COMMENT 'This order has been filled by order #',
+     date_considered    DATETIME        NULL                    COMMENT '',
+     date_placed        DATETIME        NULL                    COMMENT '',
+     date_filled        DATETIME        NULL                    COMMENT '',
+     date_cancel_placed DATETIME        NULL                    COMMENT '',
+     date_cancelled     DATETIME        NULL                    COMMENT '',
+     date_stop_loss     DATETIME        NULL                    COMMENT '',
+     PRIMARY KEY (id),
+     KEY (account_id)
+    );
+
+CREATE TABLE IF NOT EXISTS test_xref
+    (id                 INT             AUTO_INCREMENT  COMMENT '',
+     commodity_id       VARCHAR(4)      NOT NULL        COMMENT 'The ID of the commodity',
+     contract_month     VARCHAR(10)     NOT NULL        COMMENT 'The contract month this test is for',
+     test_class         VARCHAR(100)    NOT NULL        COMMENT '',
+     test_id            INT             NOT NULL        COMMENT '',
+     test_interval      INT             NOT NULL        COMMENT 'The interval to use for short/medium/long term tests',
+     success_ratio      DECIMAL(18,16)  NOT NULL        COMMENT 'The ratio of win/total trades',
+     profit_loss        DECIMAL(18,2)   NOT NULL        COMMENT '',
+     PRIMARY KEY (id),
+     KEY (success_ratio)
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

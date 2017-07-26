@@ -1,0 +1,12 @@
+USE commodities
+
+######################
+# REQUIRED DATA LOAD #
+######################
+LOAD DATA INFILE "C:/JavaProjects/Commodities/database definition/initial data/month_lookup.txt" IGNORE INTO TABLE month_lookup IGNORE 1 LINES;
+
+######################
+# OPTIONAL DATA LOAD #
+######################
+LOAD DATA INFILE "C:/JavaProjects/Commodities/database definition/initial data/optional data/commodity.txt" IGNORE INTO TABLE commodity IGNORE 1 LINES;
+LOAD DATA INFILE "C:/JavaProjects/Commodities/database definition/initial data/optional data/commodity_price_pages.txt" IGNORE INTO TABLE commodity_price_pages IGNORE 1 LINES;

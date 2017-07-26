@@ -1,0 +1,409 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*  x Properly Documented<a name="line.1"></a>
+<FONT color="green">002</FONT>     */<a name="line.2"></a>
+<FONT color="green">003</FONT>    package commodities.window;<a name="line.3"></a>
+<FONT color="green">004</FONT>    <a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.awt.*;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.awt.event.*;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import java.io.*;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import javax.swing.*;<a name="line.8"></a>
+<FONT color="green">009</FONT>    <a name="line.9"></a>
+<FONT color="green">010</FONT>    import commodities.dataaccess.*;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import commodities.commodity.*;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import commodities.window.*;<a name="line.12"></a>
+<FONT color="green">013</FONT>    <a name="line.13"></a>
+<FONT color="green">014</FONT>    /**<a name="line.14"></a>
+<FONT color="green">015</FONT>     *  The CommodityDialog class creates a dialog box with a<a name="line.15"></a>
+<FONT color="green">016</FONT>     *  form for editing commodity informaiton.<a name="line.16"></a>
+<FONT color="green">017</FONT>     *<a name="line.17"></a>
+<FONT color="green">018</FONT>     *  @author J.R. Titko<a name="line.18"></a>
+<FONT color="green">019</FONT>     *  @version 1.0<a name="line.19"></a>
+<FONT color="green">020</FONT>     *  @update 2004.11.11<a name="line.20"></a>
+<FONT color="green">021</FONT>     */<a name="line.21"></a>
+<FONT color="green">022</FONT>    <a name="line.22"></a>
+<FONT color="green">023</FONT>    public class CommodityDialog extends JDialog {<a name="line.23"></a>
+<FONT color="green">024</FONT>    /* *************************************** */<a name="line.24"></a>
+<FONT color="green">025</FONT>    /* *** CLASS VARIABLES                 *** */<a name="line.25"></a>
+<FONT color="green">026</FONT>    /* *************************************** */<a name="line.26"></a>
+<FONT color="green">027</FONT>        /** A reference to the data manager. */<a name="line.27"></a>
+<FONT color="green">028</FONT>        private static DataManagerInterface dataManager = DataManagerFactory.instance();<a name="line.28"></a>
+<FONT color="green">029</FONT>        /** Dialog width */<a name="line.29"></a>
+<FONT color="green">030</FONT>        private static final int DIALOG_WIDTH = 600;<a name="line.30"></a>
+<FONT color="green">031</FONT>        /** Dialog height */<a name="line.31"></a>
+<FONT color="green">032</FONT>        private static final int DIALOG_HEIGHT = 220;<a name="line.32"></a>
+<FONT color="green">033</FONT>    <a name="line.33"></a>
+<FONT color="green">034</FONT>    /* *************************************** */<a name="line.34"></a>
+<FONT color="green">035</FONT>    /* *** INSTANCE VARIABLES              *** */<a name="line.35"></a>
+<FONT color="green">036</FONT>    /* *************************************** */<a name="line.36"></a>
+<FONT color="green">037</FONT>        /** The commodity to be edited. */<a name="line.37"></a>
+<FONT color="green">038</FONT>        private Commodity commodity = null;<a name="line.38"></a>
+<FONT color="green">039</FONT>    <a name="line.39"></a>
+<FONT color="green">040</FONT>        /** The Commit button. */<a name="line.40"></a>
+<FONT color="green">041</FONT>        private JButton acceptBtn = new JButton("Commit");<a name="line.41"></a>
+<FONT color="green">042</FONT>        /** The Cancel button. */<a name="line.42"></a>
+<FONT color="green">043</FONT>        private JButton cancelBtn = new JButton("Cancel");<a name="line.43"></a>
+<FONT color="green">044</FONT>    <a name="line.44"></a>
+<FONT color="green">045</FONT>        /** The commodity symbol text field. */<a name="line.45"></a>
+<FONT color="green">046</FONT>        private JTextField symbolTF             = new JTextField(15);<a name="line.46"></a>
+<FONT color="green">047</FONT>        /** The commodity exchange text field. */<a name="line.47"></a>
+<FONT color="green">048</FONT>        private JTextField exchangeTF           = new JTextField(15);<a name="line.48"></a>
+<FONT color="green">049</FONT>        /** The english name of the commodity text field. */<a name="line.49"></a>
+<FONT color="green">050</FONT>        private JTextField nameTF               = new JTextField(15);<a name="line.50"></a>
+<FONT color="green">051</FONT>        /** The commodity's unit of trade text field. */<a name="line.51"></a>
+<FONT color="green">052</FONT>        private JTextField unitTypeTF           = new JTextField(15);<a name="line.52"></a>
+<FONT color="green">053</FONT>        /** The number of units in the contract text field. */<a name="line.53"></a>
+<FONT color="green">054</FONT>        private JTextField unitSizeTF           = new JTextField(15);<a name="line.54"></a>
+<FONT color="green">055</FONT>        /** The type of price the unit is priced in (dollars, cents, etc) text field. */<a name="line.55"></a>
+<FONT color="green">056</FONT>        private JTextField unitPriceTF          = new JTextField(15);<a name="line.56"></a>
+<FONT color="green">057</FONT>        /** The size of a tick (minimum movement size) text field. */<a name="line.57"></a>
+<FONT color="green">058</FONT>        private JTextField tickSizeTF           = new JTextField(15);<a name="line.58"></a>
+<FONT color="green">059</FONT>        /** The price of a tick (cost of a single tick move) text field. */<a name="line.59"></a>
+<FONT color="green">060</FONT>        private JTextField tickPriceTF          = new JTextField(15);<a name="line.60"></a>
+<FONT color="green">061</FONT>        /** The maximum number of ticks a price can move in a day text field. */<a name="line.61"></a>
+<FONT color="green">062</FONT>        private JTextField tickDailyLimitTF     = new JTextField(15);<a name="line.62"></a>
+<FONT color="green">063</FONT>        /** The standard price of a commodity contract text field. */<a name="line.63"></a>
+<FONT color="green">064</FONT>        private JTextField marginTF      = new JTextField(15);<a name="line.64"></a>
+<FONT color="green">065</FONT>        /** The number of decimals a price is displayed with text field. */<a name="line.65"></a>
+<FONT color="green">066</FONT>        private JTextField decimalsTF           = new JTextField(15);<a name="line.66"></a>
+<FONT color="green">067</FONT>        /** The trading month symbols for the commodity text field. */<a name="line.67"></a>
+<FONT color="green">068</FONT>        private JTextField monthsTF           = new JTextField(15);<a name="line.68"></a>
+<FONT color="green">069</FONT>        /** The open outcry symbol text field. */<a name="line.69"></a>
+<FONT color="green">070</FONT>        private JTextField openOutcrySymbolTF   = new JTextField(15);<a name="line.70"></a>
+<FONT color="green">071</FONT>        /** The a/c/m symbol text field. */<a name="line.71"></a>
+<FONT color="green">072</FONT>        private JTextField acmSymbolTF          = new JTextField(15);<a name="line.72"></a>
+<FONT color="green">073</FONT>        /** The special DB symbol text field. */<a name="line.73"></a>
+<FONT color="green">074</FONT>        private JTextField databaseSymbolTF     = new JTextField(15);<a name="line.74"></a>
+<FONT color="green">075</FONT>    <a name="line.75"></a>
+<FONT color="green">076</FONT>    <a name="line.76"></a>
+<FONT color="green">077</FONT>    /* *************************************** */<a name="line.77"></a>
+<FONT color="green">078</FONT>    /* *** INNER CLASSES                   *** */<a name="line.78"></a>
+<FONT color="green">079</FONT>    /* *************************************** */<a name="line.79"></a>
+<FONT color="green">080</FONT>        /**<a name="line.80"></a>
+<FONT color="green">081</FONT>         *  The FieldPanel class creates a panel that contains the name<a name="line.81"></a>
+<FONT color="green">082</FONT>         *  of a field and a text box for that field.<a name="line.82"></a>
+<FONT color="green">083</FONT>         *<a name="line.83"></a>
+<FONT color="green">084</FONT>         *  @author J.R. Titko<a name="line.84"></a>
+<FONT color="green">085</FONT>         */<a name="line.85"></a>
+<FONT color="green">086</FONT>    <a name="line.86"></a>
+<FONT color="green">087</FONT>        private class FieldPanel extends JPanel {<a name="line.87"></a>
+<FONT color="green">088</FONT>            /**<a name="line.88"></a>
+<FONT color="green">089</FONT>             *  Create a panel with a label (title) and text field for input.<a name="line.89"></a>
+<FONT color="green">090</FONT>             *<a name="line.90"></a>
+<FONT color="green">091</FONT>             *  @param  textField   The text field to be edited<a name="line.91"></a>
+<FONT color="green">092</FONT>             *  @param  title       The label to be displayed for the text field<a name="line.92"></a>
+<FONT color="green">093</FONT>             */<a name="line.93"></a>
+<FONT color="green">094</FONT>            public FieldPanel(JTextField textField, String title) {<a name="line.94"></a>
+<FONT color="green">095</FONT>                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));<a name="line.95"></a>
+<FONT color="green">096</FONT>                setPreferredSize(new Dimension(180, 35));<a name="line.96"></a>
+<FONT color="green">097</FONT>                JLabel label = new JLabel(title);<a name="line.97"></a>
+<FONT color="green">098</FONT>                label.setLabelFor(textField);<a name="line.98"></a>
+<FONT color="green">099</FONT>                add(label);<a name="line.99"></a>
+<FONT color="green">100</FONT>                add(textField);<a name="line.100"></a>
+<FONT color="green">101</FONT>            }<a name="line.101"></a>
+<FONT color="green">102</FONT>        }<a name="line.102"></a>
+<FONT color="green">103</FONT>    <a name="line.103"></a>
+<FONT color="green">104</FONT>    /* *************************************** */<a name="line.104"></a>
+<FONT color="green">105</FONT>    /* *** CONSTRUCTORS                    *** */<a name="line.105"></a>
+<FONT color="green">106</FONT>    /* *************************************** */<a name="line.106"></a>
+<FONT color="green">107</FONT>        /**<a name="line.107"></a>
+<FONT color="green">108</FONT>         *  Create a dialog box for a new commodity to be entered.<a name="line.108"></a>
+<FONT color="green">109</FONT>         */<a name="line.109"></a>
+<FONT color="green">110</FONT>        public CommodityDialog() {<a name="line.110"></a>
+<FONT color="green">111</FONT>            this(null);<a name="line.111"></a>
+<FONT color="green">112</FONT>        }<a name="line.112"></a>
+<FONT color="green">113</FONT>    <a name="line.113"></a>
+<FONT color="green">114</FONT>        /**<a name="line.114"></a>
+<FONT color="green">115</FONT>         *  Create a dialog box for an existing commodity to be edited.<a name="line.115"></a>
+<FONT color="green">116</FONT>         *<a name="line.116"></a>
+<FONT color="green">117</FONT>         *  @param  commodity   The commodity to be edited<a name="line.117"></a>
+<FONT color="green">118</FONT>         */<a name="line.118"></a>
+<FONT color="green">119</FONT>        public CommodityDialog(Commodity commodity) {<a name="line.119"></a>
+<FONT color="green">120</FONT>            super(CommodityAnalyzerJFrame.instance(), "Commodity Maintenance", true);<a name="line.120"></a>
+<FONT color="green">121</FONT>    <a name="line.121"></a>
+<FONT color="green">122</FONT>            this.commodity = commodity;<a name="line.122"></a>
+<FONT color="green">123</FONT>            setupGUI();<a name="line.123"></a>
+<FONT color="green">124</FONT>        }<a name="line.124"></a>
+<FONT color="green">125</FONT>    <a name="line.125"></a>
+<FONT color="green">126</FONT>    /* *************************************** */<a name="line.126"></a>
+<FONT color="green">127</FONT>    /* *** INSTANCE METHODS                *** */<a name="line.127"></a>
+<FONT color="green">128</FONT>    /* *************************************** */<a name="line.128"></a>
+<FONT color="green">129</FONT>        /**<a name="line.129"></a>
+<FONT color="green">130</FONT>         *  Set up the GUI interface of the commodity dialog box.<a name="line.130"></a>
+<FONT color="green">131</FONT>         */<a name="line.131"></a>
+<FONT color="green">132</FONT>        private void setupGUI() {<a name="line.132"></a>
+<FONT color="green">133</FONT>            setResizable(false);<a name="line.133"></a>
+<FONT color="green">134</FONT>            Dimension screenSize = CommodityAnalyzerJFrame.instance().getBounds().getSize();<a name="line.134"></a>
+<FONT color="green">135</FONT>            setLocation(((screenSize.width - DIALOG_WIDTH) / 2), ((screenSize.height - DIALOG_HEIGHT) / 3));<a name="line.135"></a>
+<FONT color="green">136</FONT>    <a name="line.136"></a>
+<FONT color="green">137</FONT>            acceptBtn.addActionListener(new ActionListener() {<a name="line.137"></a>
+<FONT color="green">138</FONT>                public void actionPerformed(ActionEvent event) {<a name="line.138"></a>
+<FONT color="green">139</FONT>                    try {<a name="line.139"></a>
+<FONT color="green">140</FONT>                        if (!"".equals(symbolTF.getText()) &&<a name="line.140"></a>
+<FONT color="green">141</FONT>                            !"".equals(exchangeTF.getText()) &&<a name="line.141"></a>
+<FONT color="green">142</FONT>                            !"".equals(nameTF.getText()) &&<a name="line.142"></a>
+<FONT color="green">143</FONT>                            !"".equals(unitTypeTF.getText()) &&<a name="line.143"></a>
+<FONT color="green">144</FONT>                            !"".equals(unitSizeTF.getText()) &&<a name="line.144"></a>
+<FONT color="green">145</FONT>                            !"".equals(unitPriceTF.getText()) &&<a name="line.145"></a>
+<FONT color="green">146</FONT>                            !"".equals(tickSizeTF.getText()) &&<a name="line.146"></a>
+<FONT color="green">147</FONT>                            !"".equals(tickPriceTF.getText()) &&<a name="line.147"></a>
+<FONT color="green">148</FONT>                            !"".equals(tickDailyLimitTF.getText()) &&<a name="line.148"></a>
+<FONT color="green">149</FONT>                            !"".equals(marginTF.getText()) &&<a name="line.149"></a>
+<FONT color="green">150</FONT>                            !"".equals(decimalsTF.getText()) &&<a name="line.150"></a>
+<FONT color="green">151</FONT>                            !"".equals(monthsTF.getText())) {<a name="line.151"></a>
+<FONT color="green">152</FONT>    <a name="line.152"></a>
+<FONT color="green">153</FONT>                            int monthMask = formatMonthMask(monthsTF.getText());<a name="line.153"></a>
+<FONT color="green">154</FONT>    <a name="line.154"></a>
+<FONT color="green">155</FONT>                            if (commodity == null) {<a name="line.155"></a>
+<FONT color="green">156</FONT>                                commodity = new Commodity(symbolTF.getText(),<a name="line.156"></a>
+<FONT color="green">157</FONT>                                                          exchangeTF.getText(),<a name="line.157"></a>
+<FONT color="green">158</FONT>                                                          nameTF.getText(),<a name="line.158"></a>
+<FONT color="green">159</FONT>                                                          unitTypeTF.getText(),<a name="line.159"></a>
+<FONT color="green">160</FONT>                                                          Integer.parseInt(unitSizeTF.getText()),<a name="line.160"></a>
+<FONT color="green">161</FONT>                                                          unitPriceTF.getText(),<a name="line.161"></a>
+<FONT color="green">162</FONT>                                                          Double.parseDouble(tickSizeTF.getText()),<a name="line.162"></a>
+<FONT color="green">163</FONT>                                                          Double.parseDouble(tickPriceTF.getText()),<a name="line.163"></a>
+<FONT color="green">164</FONT>                                                          Integer.parseInt(tickDailyLimitTF.getText()),<a name="line.164"></a>
+<FONT color="green">165</FONT>                                                          Integer.parseInt(marginTF.getText()),<a name="line.165"></a>
+<FONT color="green">166</FONT>                                                          Integer.parseInt(decimalsTF.getText()),<a name="line.166"></a>
+<FONT color="green">167</FONT>                                                          openOutcrySymbolTF.getText(),<a name="line.167"></a>
+<FONT color="green">168</FONT>                                                          acmSymbolTF.getText(),<a name="line.168"></a>
+<FONT color="green">169</FONT>                                                          monthMask,<a name="line.169"></a>
+<FONT color="green">170</FONT>                                                          databaseSymbolTF.getText());<a name="line.170"></a>
+<FONT color="green">171</FONT>                                try {<a name="line.171"></a>
+<FONT color="green">172</FONT>                                    dataManager.addCommodity(commodity);<a name="line.172"></a>
+<FONT color="green">173</FONT>                                } catch (IOException e) {<a name="line.173"></a>
+<FONT color="green">174</FONT>                                    e.printStackTrace();<a name="line.174"></a>
+<FONT color="green">175</FONT>                                }<a name="line.175"></a>
+<FONT color="green">176</FONT>                            } else {<a name="line.176"></a>
+<FONT color="green">177</FONT>                                commodity.setName(nameTF.getText());<a name="line.177"></a>
+<FONT color="green">178</FONT>                                commodity.setUnitType(unitTypeTF.getText());<a name="line.178"></a>
+<FONT color="green">179</FONT>                                commodity.setUnitSize(Integer.parseInt(unitSizeTF.getText()));<a name="line.179"></a>
+<FONT color="green">180</FONT>                                commodity.setUnitPrice(unitPriceTF.getText());<a name="line.180"></a>
+<FONT color="green">181</FONT>                                commodity.setTickSize(Double.parseDouble(tickSizeTF.getText()));<a name="line.181"></a>
+<FONT color="green">182</FONT>                                commodity.setTickPrice(Double.parseDouble(tickPriceTF.getText()));<a name="line.182"></a>
+<FONT color="green">183</FONT>                                commodity.setTickDailyLimit(Integer.parseInt(tickDailyLimitTF.getText()));<a name="line.183"></a>
+<FONT color="green">184</FONT>                                commodity.setMargin(Integer.parseInt(marginTF.getText()));<a name="line.184"></a>
+<FONT color="green">185</FONT>                                commodity.setDisplayDecimals(Integer.parseInt(decimalsTF.getText()));<a name="line.185"></a>
+<FONT color="green">186</FONT>                                commodity.setOpenOutcrySymbol(openOutcrySymbolTF.getText());<a name="line.186"></a>
+<FONT color="green">187</FONT>                                commodity.setAcmSymbol(acmSymbolTF.getText());<a name="line.187"></a>
+<FONT color="green">188</FONT>                                commodity.setTradeMonthMask(monthMask);<a name="line.188"></a>
+<FONT color="green">189</FONT>                                commodity.setDatabaseSymbol(databaseSymbolTF.getText());<a name="line.189"></a>
+<FONT color="green">190</FONT>    <a name="line.190"></a>
+<FONT color="green">191</FONT>                                try {<a name="line.191"></a>
+<FONT color="green">192</FONT>                                    dataManager.updateCommodity(commodity);<a name="line.192"></a>
+<FONT color="green">193</FONT>                                } catch (IOException e) {<a name="line.193"></a>
+<FONT color="green">194</FONT>                                    e.printStackTrace();<a name="line.194"></a>
+<FONT color="green">195</FONT>                                }<a name="line.195"></a>
+<FONT color="green">196</FONT>                            }<a name="line.196"></a>
+<FONT color="green">197</FONT>    <a name="line.197"></a>
+<FONT color="green">198</FONT>                            setVisible(false);<a name="line.198"></a>
+<FONT color="green">199</FONT>                            dispose();<a name="line.199"></a>
+<FONT color="green">200</FONT>                        } else {<a name="line.200"></a>
+<FONT color="green">201</FONT>                            JOptionPane.showMessageDialog(CommodityAnalyzerJFrame.instance(), "Not all required fields are entered.");<a name="line.201"></a>
+<FONT color="green">202</FONT>                        }<a name="line.202"></a>
+<FONT color="green">203</FONT>                    } catch (NumberFormatException ex) {<a name="line.203"></a>
+<FONT color="green">204</FONT>                        JOptionPane.showMessageDialog(CommodityAnalyzerJFrame.instance(), "Fields are not propertly formatted.");<a name="line.204"></a>
+<FONT color="green">205</FONT>                    }<a name="line.205"></a>
+<FONT color="green">206</FONT>                }<a name="line.206"></a>
+<FONT color="green">207</FONT>            });<a name="line.207"></a>
+<FONT color="green">208</FONT>    <a name="line.208"></a>
+<FONT color="green">209</FONT>            cancelBtn.addActionListener(new ActionListener() {<a name="line.209"></a>
+<FONT color="green">210</FONT>                public void actionPerformed(ActionEvent event) {<a name="line.210"></a>
+<FONT color="green">211</FONT>                    setVisible(false);<a name="line.211"></a>
+<FONT color="green">212</FONT>                    dispose();<a name="line.212"></a>
+<FONT color="green">213</FONT>                }<a name="line.213"></a>
+<FONT color="green">214</FONT>            });<a name="line.214"></a>
+<FONT color="green">215</FONT>    <a name="line.215"></a>
+<FONT color="green">216</FONT>            getRootPane().setDefaultButton(acceptBtn);<a name="line.216"></a>
+<FONT color="green">217</FONT>    <a name="line.217"></a>
+<FONT color="green">218</FONT>            JPanel inputPanel = new JPanel();<a name="line.218"></a>
+<FONT color="green">219</FONT>            inputPanel.setLayout(new FlowLayout());<a name="line.219"></a>
+<FONT color="green">220</FONT>            inputPanel.setPreferredSize(new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT));<a name="line.220"></a>
+<FONT color="green">221</FONT>    <a name="line.221"></a>
+<FONT color="green">222</FONT>            if (commodity != null) {<a name="line.222"></a>
+<FONT color="green">223</FONT>                symbolTF.setText(commodity.getSymbol());<a name="line.223"></a>
+<FONT color="green">224</FONT>                symbolTF.setEditable(false);<a name="line.224"></a>
+<FONT color="green">225</FONT>                exchangeTF.setText(commodity.getExchange());<a name="line.225"></a>
+<FONT color="green">226</FONT>                exchangeTF.setEditable(false);<a name="line.226"></a>
+<FONT color="green">227</FONT>    <a name="line.227"></a>
+<FONT color="green">228</FONT>                nameTF.setText(commodity.getName());<a name="line.228"></a>
+<FONT color="green">229</FONT>                unitTypeTF.setText(commodity.getUnitType());<a name="line.229"></a>
+<FONT color="green">230</FONT>                unitSizeTF.setText(""+commodity.getUnitSize());<a name="line.230"></a>
+<FONT color="green">231</FONT>                unitPriceTF.setText(commodity.getUnitPrice());<a name="line.231"></a>
+<FONT color="green">232</FONT>                tickSizeTF.setText(""+commodity.getTickSize());<a name="line.232"></a>
+<FONT color="green">233</FONT>                tickPriceTF.setText(""+commodity.getTickPrice());<a name="line.233"></a>
+<FONT color="green">234</FONT>                tickDailyLimitTF.setText(""+commodity.getTickDailyLimit());<a name="line.234"></a>
+<FONT color="green">235</FONT>                marginTF.setText(""+commodity.getMargin());<a name="line.235"></a>
+<FONT color="green">236</FONT>                decimalsTF.setText(""+commodity.getDisplayDecimals());<a name="line.236"></a>
+<FONT color="green">237</FONT>                monthsTF.setText(formatMonths(commodity.getTradeMonthMask()));<a name="line.237"></a>
+<FONT color="green">238</FONT>                openOutcrySymbolTF.setText(commodity.getOpenOutcrySymbol());<a name="line.238"></a>
+<FONT color="green">239</FONT>                acmSymbolTF.setText(commodity.getAcmSymbol());<a name="line.239"></a>
+<FONT color="green">240</FONT>                databaseSymbolTF.setText(commodity.getDatabaseSymbol());<a name="line.240"></a>
+<FONT color="green">241</FONT>            }<a name="line.241"></a>
+<FONT color="green">242</FONT>    <a name="line.242"></a>
+<FONT color="green">243</FONT>            inputPanel.add(new FieldPanel(symbolTF, "Symbol (ex: S)"));<a name="line.243"></a>
+<FONT color="green">244</FONT>            inputPanel.add(new FieldPanel(exchangeTF, "Exchange (ex: CBOT)"));<a name="line.244"></a>
+<FONT color="green">245</FONT>            inputPanel.add(new FieldPanel(nameTF, "Name (ex: Soybeans)"));<a name="line.245"></a>
+<FONT color="green">246</FONT>            inputPanel.add(new FieldPanel(unitTypeTF, "Unit Type  (ex: bu)"));<a name="line.246"></a>
+<FONT color="green">247</FONT>            inputPanel.add(new FieldPanel(unitSizeTF, "Unit Size (ex: 5000)"));<a name="line.247"></a>
+<FONT color="green">248</FONT>            inputPanel.add(new FieldPanel(unitPriceTF, "Unit Price  (cents)"));<a name="line.248"></a>
+<FONT color="green">249</FONT>            inputPanel.add(new FieldPanel(tickSizeTF, "Tick Size (ex: 0.25)"));<a name="line.249"></a>
+<FONT color="green">250</FONT>            inputPanel.add(new FieldPanel(tickPriceTF, "Tick Price (ex: 12.50)"));<a name="line.250"></a>
+<FONT color="green">251</FONT>            inputPanel.add(new FieldPanel(tickDailyLimitTF, "Tick Daily Limit (ex: 200)"));<a name="line.251"></a>
+<FONT color="green">252</FONT>            inputPanel.add(new FieldPanel(marginTF, "Margin (ex: 1500)"));<a name="line.252"></a>
+<FONT color="green">253</FONT>            inputPanel.add(new FieldPanel(decimalsTF, "Decimals to Display (ex: 2)"));<a name="line.253"></a>
+<FONT color="green">254</FONT>            inputPanel.add(new FieldPanel(monthsTF, "Months Traded (ex: JAN, FEB)"));<a name="line.254"></a>
+<FONT color="green">255</FONT>            inputPanel.add(new FieldPanel(openOutcrySymbolTF, "Open Outcry Symbol (opt)"));<a name="line.255"></a>
+<FONT color="green">256</FONT>            inputPanel.add(new FieldPanel(acmSymbolTF, "ACM Symbol (opt)"));<a name="line.256"></a>
+<FONT color="green">257</FONT>            inputPanel.add(new FieldPanel(databaseSymbolTF, "Database Symbol (opt)"));<a name="line.257"></a>
+<FONT color="green">258</FONT>    <a name="line.258"></a>
+<FONT color="green">259</FONT>    <a name="line.259"></a>
+<FONT color="green">260</FONT>            JPanel buttonPanel = new JPanel();<a name="line.260"></a>
+<FONT color="green">261</FONT>            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));<a name="line.261"></a>
+<FONT color="green">262</FONT>            buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));<a name="line.262"></a>
+<FONT color="green">263</FONT>            buttonPanel.add(Box.createHorizontalGlue());<a name="line.263"></a>
+<FONT color="green">264</FONT>            buttonPanel.add(acceptBtn);<a name="line.264"></a>
+<FONT color="green">265</FONT>            buttonPanel.add(Box.createHorizontalStrut(10));<a name="line.265"></a>
+<FONT color="green">266</FONT>            buttonPanel.add(cancelBtn);<a name="line.266"></a>
+<FONT color="green">267</FONT>            buttonPanel.add(Box.createHorizontalGlue());<a name="line.267"></a>
+<FONT color="green">268</FONT>    <a name="line.268"></a>
+<FONT color="green">269</FONT>            Container contentPane = getContentPane();<a name="line.269"></a>
+<FONT color="green">270</FONT>            contentPane.add(inputPanel, BorderLayout.CENTER);<a name="line.270"></a>
+<FONT color="green">271</FONT>            contentPane.add(buttonPanel, BorderLayout.SOUTH);<a name="line.271"></a>
+<FONT color="green">272</FONT>    <a name="line.272"></a>
+<FONT color="green">273</FONT>            pack();<a name="line.273"></a>
+<FONT color="green">274</FONT>            setVisible(true);<a name="line.274"></a>
+<FONT color="green">275</FONT>        }<a name="line.275"></a>
+<FONT color="green">276</FONT>    <a name="line.276"></a>
+<FONT color="green">277</FONT>        /**<a name="line.277"></a>
+<FONT color="green">278</FONT>         *  Format the names of the months based on the month mask for the commodity.<a name="line.278"></a>
+<FONT color="green">279</FONT>         *  The names are formatted using a comma dilimited list of 3 char month names.<a name="line.279"></a>
+<FONT color="green">280</FONT>         *<a name="line.280"></a>
+<FONT color="green">281</FONT>         *  @param  monthMask   The binary month mask for the commodity trading months<a name="line.281"></a>
+<FONT color="green">282</FONT>         *  @return             The list of trading months in string format<a name="line.282"></a>
+<FONT color="green">283</FONT>         */<a name="line.283"></a>
+<FONT color="green">284</FONT>        private String formatMonths(int monthMask) {<a name="line.284"></a>
+<FONT color="green">285</FONT>            String months = "";<a name="line.285"></a>
+<FONT color="green">286</FONT>            boolean first = true;<a name="line.286"></a>
+<FONT color="green">287</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.JAN, "JAN", first))) { first = false; };<a name="line.287"></a>
+<FONT color="green">288</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.FEB, "FEB", first))) { first = false; };<a name="line.288"></a>
+<FONT color="green">289</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.MAR, "MAR", first))) { first = false; };<a name="line.289"></a>
+<FONT color="green">290</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.APR, "APR", first))) { first = false; };<a name="line.290"></a>
+<FONT color="green">291</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.MAY, "MAY", first))) { first = false; };<a name="line.291"></a>
+<FONT color="green">292</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.JUN, "JUN", first))) { first = false; };<a name="line.292"></a>
+<FONT color="green">293</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.JUL, "JUL", first))) { first = false; };<a name="line.293"></a>
+<FONT color="green">294</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.AUG, "AUG", first))) { first = false; };<a name="line.294"></a>
+<FONT color="green">295</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.SEP, "SEP", first))) { first = false; };<a name="line.295"></a>
+<FONT color="green">296</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.OCT, "OCT", first))) { first = false; };<a name="line.296"></a>
+<FONT color="green">297</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.NOV, "NOV", first))) { first = false; };<a name="line.297"></a>
+<FONT color="green">298</FONT>            if (!"".equals(months += formatMonth(monthMask, Commodity.DEC, "DEC", first))) { first = false; };<a name="line.298"></a>
+<FONT color="green">299</FONT>            return months;<a name="line.299"></a>
+<FONT color="green">300</FONT>        }<a name="line.300"></a>
+<FONT color="green">301</FONT>    <a name="line.301"></a>
+<FONT color="green">302</FONT>        /**<a name="line.302"></a>
+<FONT color="green">303</FONT>         *  Perform the formatting logic for a single month.<a name="line.303"></a>
+<FONT color="green">304</FONT>         *<a name="line.304"></a>
+<FONT color="green">305</FONT>         *  @param  monthMask   The binary month mask for the commodity trading months<a name="line.305"></a>
+<FONT color="green">306</FONT>         *  @param  mask        The binary month mask for a single month<a name="line.306"></a>
+<FONT color="green">307</FONT>         *  @param  month       The month string to be used if found in the month mask<a name="line.307"></a>
+<FONT color="green">308</FONT>         *  @param  first       Is this the first month found for the month string<a name="line.308"></a>
+<FONT color="green">309</FONT>         *  @return             The list of trading months in string format<a name="line.309"></a>
+<FONT color="green">310</FONT>         */<a name="line.310"></a>
+<FONT color="green">311</FONT>        private String formatMonth(int monthMask, int mask, String month, boolean first) {<a name="line.311"></a>
+<FONT color="green">312</FONT>            String label = "";<a name="line.312"></a>
+<FONT color="green">313</FONT>            if ((monthMask & mask) > 0) {<a name="line.313"></a>
+<FONT color="green">314</FONT>                label = first?month:", " + month;<a name="line.314"></a>
+<FONT color="green">315</FONT>            }<a name="line.315"></a>
+<FONT color="green">316</FONT>            return label;<a name="line.316"></a>
+<FONT color="green">317</FONT>        }<a name="line.317"></a>
+<FONT color="green">318</FONT>    <a name="line.318"></a>
+<FONT color="green">319</FONT>        /**<a name="line.319"></a>
+<FONT color="green">320</FONT>         *  Format the month mask based on the 3 character month names.<a name="line.320"></a>
+<FONT color="green">321</FONT>         *<a name="line.321"></a>
+<FONT color="green">322</FONT>         *  @param  monthMask   The list of trading months in string format<a name="line.322"></a>
+<FONT color="green">323</FONT>         *  @return             The binary month mask for the commodity trading months<a name="line.323"></a>
+<FONT color="green">324</FONT>         */<a name="line.324"></a>
+<FONT color="green">325</FONT>        private int formatMonthMask(String monthText) {<a name="line.325"></a>
+<FONT color="green">326</FONT>            int monthMask = 0;<a name="line.326"></a>
+<FONT color="green">327</FONT>            monthText = monthText.toUpperCase();<a name="line.327"></a>
+<FONT color="green">328</FONT>    <a name="line.328"></a>
+<FONT color="green">329</FONT>            if (monthText.indexOf("JAN") > -1) { monthMask += Commodity.JAN; }<a name="line.329"></a>
+<FONT color="green">330</FONT>            if (monthText.indexOf("FEB") > -1) { monthMask += Commodity.FEB; }<a name="line.330"></a>
+<FONT color="green">331</FONT>            if (monthText.indexOf("MAR") > -1) { monthMask += Commodity.MAR; }<a name="line.331"></a>
+<FONT color="green">332</FONT>            if (monthText.indexOf("APR") > -1) { monthMask += Commodity.APR; }<a name="line.332"></a>
+<FONT color="green">333</FONT>            if (monthText.indexOf("MAY") > -1) { monthMask += Commodity.MAY; }<a name="line.333"></a>
+<FONT color="green">334</FONT>            if (monthText.indexOf("JUN") > -1) { monthMask += Commodity.JUN; }<a name="line.334"></a>
+<FONT color="green">335</FONT>            if (monthText.indexOf("JUL") > -1) { monthMask += Commodity.JUL; }<a name="line.335"></a>
+<FONT color="green">336</FONT>            if (monthText.indexOf("AUG") > -1) { monthMask += Commodity.AUG; }<a name="line.336"></a>
+<FONT color="green">337</FONT>            if (monthText.indexOf("SEP") > -1) { monthMask += Commodity.SEP; }<a name="line.337"></a>
+<FONT color="green">338</FONT>            if (monthText.indexOf("OCT") > -1) { monthMask += Commodity.OCT; }<a name="line.338"></a>
+<FONT color="green">339</FONT>            if (monthText.indexOf("NOV") > -1) { monthMask += Commodity.NOV; }<a name="line.339"></a>
+<FONT color="green">340</FONT>            if (monthText.indexOf("DEC") > -1) { monthMask += Commodity.DEC; }<a name="line.340"></a>
+<FONT color="green">341</FONT>            return monthMask;<a name="line.341"></a>
+<FONT color="green">342</FONT>        }<a name="line.342"></a>
+<FONT color="green">343</FONT>    }<a name="line.343"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

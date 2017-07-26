@@ -1,0 +1,895 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*  x Properly Documented<a name="line.1"></a>
+<FONT color="green">002</FONT>     */<a name="line.2"></a>
+<FONT color="green">003</FONT>    package commodities.contract;<a name="line.3"></a>
+<FONT color="green">004</FONT>    <a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.io.*;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.util.*;<a name="line.6"></a>
+<FONT color="green">007</FONT>    <a name="line.7"></a>
+<FONT color="green">008</FONT>    import commodities.commodity.*;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import commodities.dataaccess.*;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import commodities.event.*;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import commodities.price.*;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import commodities.tests.technical.*;<a name="line.12"></a>
+<FONT color="green">013</FONT>    import commodities.util.*;<a name="line.13"></a>
+<FONT color="green">014</FONT>    <a name="line.14"></a>
+<FONT color="green">015</FONT>    import com.lang.Trilean;<a name="line.15"></a>
+<FONT color="green">016</FONT>    import com.util.LinkedTreeMap;<a name="line.16"></a>
+<FONT color="green">017</FONT>    import com.util.ThreadPool;<a name="line.17"></a>
+<FONT color="green">018</FONT>    <a name="line.18"></a>
+<FONT color="green">019</FONT>    /**<a name="line.19"></a>
+<FONT color="green">020</FONT>     *  The Contract class represents the information for a given delivery month.<a name="line.20"></a>
+<FONT color="green">021</FONT>     *<a name="line.21"></a>
+<FONT color="green">022</FONT>     *  @author J.R. Titko<a name="line.22"></a>
+<FONT color="green">023</FONT>     *  @version 1.0<a name="line.23"></a>
+<FONT color="green">024</FONT>     *  @update 2004.11.11<a name="line.24"></a>
+<FONT color="green">025</FONT>     */<a name="line.25"></a>
+<FONT color="green">026</FONT>    public class Contract {<a name="line.26"></a>
+<FONT color="green">027</FONT>    <a name="line.27"></a>
+<FONT color="green">028</FONT>    /* *************************************** */<a name="line.28"></a>
+<FONT color="green">029</FONT>    /* *** CLASS VARIABLES                 *** */<a name="line.29"></a>
+<FONT color="green">030</FONT>    /* *************************************** */<a name="line.30"></a>
+<FONT color="green">031</FONT>        /** A reference to the data manager. */<a name="line.31"></a>
+<FONT color="green">032</FONT>        private static DataManagerInterface dataManager = DataManagerFactory.instance();<a name="line.32"></a>
+<FONT color="green">033</FONT>    <a name="line.33"></a>
+<FONT color="green">034</FONT>        /** The ThreadPool to use with loading prices. */<a name="line.34"></a>
+<FONT color="green">035</FONT>        private static ThreadPool priceThreadPool = new ThreadPool(5);<a name="line.35"></a>
+<FONT color="green">036</FONT>    <a name="line.36"></a>
+<FONT color="green">037</FONT>        /** The number of tests to use as the best tests */<a name="line.37"></a>
+<FONT color="green">038</FONT>        private static final int NUMBER_OF_BEST_TESTS = 5;<a name="line.38"></a>
+<FONT color="green">039</FONT>    <a name="line.39"></a>
+<FONT color="green">040</FONT>        /** Listeners for changing the selected contract. */<a name="line.40"></a>
+<FONT color="green">041</FONT>        private static Collection selectionListeners = new HashSet();<a name="line.41"></a>
+<FONT color="green">042</FONT>        /** The contract that is currently selected. */<a name="line.42"></a>
+<FONT color="green">043</FONT>        private static Contract selectedContract;<a name="line.43"></a>
+<FONT color="green">044</FONT>    <a name="line.44"></a>
+<FONT color="green">045</FONT>        /** Ascending indicator for price retrieval. */<a name="line.45"></a>
+<FONT color="green">046</FONT>        public static final boolean ASCENDING = false;<a name="line.46"></a>
+<FONT color="green">047</FONT>        /** Descending indicator for price retrieval. */<a name="line.47"></a>
+<FONT color="green">048</FONT>        public static final boolean DESCENDING = true;<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>    <a name="line.50"></a>
+<FONT color="green">051</FONT>    /* *************************************** */<a name="line.51"></a>
+<FONT color="green">052</FONT>    /* *** INSTANCE VARIABLES              *** */<a name="line.52"></a>
+<FONT color="green">053</FONT>    /* *************************************** */<a name="line.53"></a>
+<FONT color="green">054</FONT>        /** The unique identifier for this contract. */<a name="line.54"></a>
+<FONT color="green">055</FONT>        private int     id;<a name="line.55"></a>
+<FONT color="green">056</FONT>        /** The symbol for the commodity. */<a name="line.56"></a>
+<FONT color="green">057</FONT>        private String  symbol;<a name="line.57"></a>
+<FONT color="green">058</FONT>        /** The trading month of this contract. */<a name="line.58"></a>
+<FONT color="green">059</FONT>        private String  month;<a name="line.59"></a>
+<FONT color="green">060</FONT>        /** The margin of the contract in dollars. */<a name="line.60"></a>
+<FONT color="green">061</FONT>        private int     margin;<a name="line.61"></a>
+<FONT color="green">062</FONT>        /** A reference to the commodity for this contract. */<a name="line.62"></a>
+<FONT color="green">063</FONT>        private Commodity commodity;<a name="line.63"></a>
+<FONT color="green">064</FONT>    <a name="line.64"></a>
+<FONT color="green">065</FONT>        /** A list of daily prices for this commodity */<a name="line.65"></a>
+<FONT color="green">066</FONT>        private LinkedTreeMap priceList = new LinkedTreeMap();<a name="line.66"></a>
+<FONT color="green">067</FONT>        /** Load status of the price list.  Pos1 = not loaded, Pos2 = loading, Pos3 = loaded */<a name="line.67"></a>
+<FONT color="green">068</FONT>        private Trilean priceListStatus = new Trilean();<a name="line.68"></a>
+<FONT color="green">069</FONT>        /** Current price */<a name="line.69"></a>
+<FONT color="green">070</FONT>        private Prices currentPrices = null;<a name="line.70"></a>
+<FONT color="green">071</FONT>    <a name="line.71"></a>
+<FONT color="green">072</FONT>        /** The maximum price for the life of the contract. */<a name="line.72"></a>
+<FONT color="green">073</FONT>        private double  maxPrice = 0.0;<a name="line.73"></a>
+<FONT color="green">074</FONT>        /** The minimum price for the life of the contract. */<a name="line.74"></a>
+<FONT color="green">075</FONT>        private double  minPrice = 99999.0;<a name="line.75"></a>
+<FONT color="green">076</FONT>    <a name="line.76"></a>
+<FONT color="green">077</FONT>        /** Collection of the best short term tests. */<a name="line.77"></a>
+<FONT color="green">078</FONT>        private Collection shortTermBestTests;<a name="line.78"></a>
+<FONT color="green">079</FONT>        /** Collection of the best medium term tests. */<a name="line.79"></a>
+<FONT color="green">080</FONT>        private Collection mediumTermBestTests;<a name="line.80"></a>
+<FONT color="green">081</FONT>        /** Collection of the best long term tests. */<a name="line.81"></a>
+<FONT color="green">082</FONT>        private Collection longTermBestTests;<a name="line.82"></a>
+<FONT color="green">083</FONT>    <a name="line.83"></a>
+<FONT color="green">084</FONT>        /** TreeSet of only critical high price points. */<a name="line.84"></a>
+<FONT color="green">085</FONT>        private Collection highPricePoints;<a name="line.85"></a>
+<FONT color="green">086</FONT>        /** TreeSet of only critical low price points. */<a name="line.86"></a>
+<FONT color="green">087</FONT>        private Collection lowPricePoints;<a name="line.87"></a>
+<FONT color="green">088</FONT>        /** TreeSet of critical high and low price points. */<a name="line.88"></a>
+<FONT color="green">089</FONT>        private Collection highLowPricePoints;<a name="line.89"></a>
+<FONT color="green">090</FONT>    <a name="line.90"></a>
+<FONT color="green">091</FONT>        /** Listeners for displaying prices. */<a name="line.91"></a>
+<FONT color="green">092</FONT>        private Collection priceDisplayListeners = new HashSet();<a name="line.92"></a>
+<FONT color="green">093</FONT>        /** Listeners for changing prices. */<a name="line.93"></a>
+<FONT color="green">094</FONT>        private Collection priceListeners = new HashSet();<a name="line.94"></a>
+<FONT color="green">095</FONT>        /** The last date the price listeners were fired for. */<a name="line.95"></a>
+<FONT color="green">096</FONT>        private java.util.Date lastFiredDate = null;<a name="line.96"></a>
+<FONT color="green">097</FONT>    <a name="line.97"></a>
+<FONT color="green">098</FONT>    /* *************************************** */<a name="line.98"></a>
+<FONT color="green">099</FONT>    /* *** INNER CLASSES                   *** */<a name="line.99"></a>
+<FONT color="green">100</FONT>    /* *************************************** */<a name="line.100"></a>
+<FONT color="green">101</FONT>        /**<a name="line.101"></a>
+<FONT color="green">102</FONT>         *  LoadThread loads the contract prices<a name="line.102"></a>
+<FONT color="green">103</FONT>         *  as a thread so the main processing can continue.<a name="line.103"></a>
+<FONT color="green">104</FONT>         *<a name="line.104"></a>
+<FONT color="green">105</FONT>         *  @author J.R. Titko<a name="line.105"></a>
+<FONT color="green">106</FONT>         */<a name="line.106"></a>
+<FONT color="green">107</FONT>        public class LoadThread implements Runnable {<a name="line.107"></a>
+<FONT color="green">108</FONT>        /* *************************************** */<a name="line.108"></a>
+<FONT color="green">109</FONT>        /* *** Thread METHODS                  *** */<a name="line.109"></a>
+<FONT color="green">110</FONT>        /* *************************************** */<a name="line.110"></a>
+<FONT color="green">111</FONT>            public void run() {<a name="line.111"></a>
+<FONT color="green">112</FONT>                try {<a name="line.112"></a>
+<FONT color="green">113</FONT>                    priceListStatus.pos2();     // mark price list as loading<a name="line.113"></a>
+<FONT color="green">114</FONT>                    Iterator it = dataManager.getPrices(id);<a name="line.114"></a>
+<FONT color="green">115</FONT>                    while (it.hasNext()) {<a name="line.115"></a>
+<FONT color="green">116</FONT>                        Prices prices = (Prices)it.next();<a name="line.116"></a>
+<FONT color="green">117</FONT>    <a name="line.117"></a>
+<FONT color="green">118</FONT>                        if ((currentPrices == null) || (prices.getDate().compareTo(currentPrices.getDate()) > 0)) {<a name="line.118"></a>
+<FONT color="green">119</FONT>                            currentPrices = prices;<a name="line.119"></a>
+<FONT color="green">120</FONT>                        }<a name="line.120"></a>
+<FONT color="green">121</FONT>    <a name="line.121"></a>
+<FONT color="green">122</FONT>                        if (prices.getHigh() > maxPrice) {<a name="line.122"></a>
+<FONT color="green">123</FONT>                            maxPrice = prices.getHigh();<a name="line.123"></a>
+<FONT color="green">124</FONT>                        }<a name="line.124"></a>
+<FONT color="green">125</FONT>                        if (prices.getLow() &lt; minPrice) {<a name="line.125"></a>
+<FONT color="green">126</FONT>                            minPrice = prices.getLow();<a name="line.126"></a>
+<FONT color="green">127</FONT>                        }<a name="line.127"></a>
+<FONT color="green">128</FONT>                        priceList.put(prices.getDate(), prices);<a name="line.128"></a>
+<FONT color="green">129</FONT>                    }<a name="line.129"></a>
+<FONT color="green">130</FONT>                } catch (IOException e) {<a name="line.130"></a>
+<FONT color="green">131</FONT>                    e.printStackTrace();<a name="line.131"></a>
+<FONT color="green">132</FONT>                }<a name="line.132"></a>
+<FONT color="green">133</FONT>    //System.out.println("firePricesUpdated #1");<a name="line.133"></a>
+<FONT color="green">134</FONT>                priceListStatus.pos3();     // mark price list as loaded<a name="line.134"></a>
+<FONT color="green">135</FONT>                firePricesUpdated(getCurrentDate());<a name="line.135"></a>
+<FONT color="green">136</FONT>            }<a name="line.136"></a>
+<FONT color="green">137</FONT>        }<a name="line.137"></a>
+<FONT color="green">138</FONT>    <a name="line.138"></a>
+<FONT color="green">139</FONT>    /* *************************************** */<a name="line.139"></a>
+<FONT color="green">140</FONT>    /* *** CONSTRUCTORS                    *** */<a name="line.140"></a>
+<FONT color="green">141</FONT>    /* *************************************** */<a name="line.141"></a>
+<FONT color="green">142</FONT>        /**<a name="line.142"></a>
+<FONT color="green">143</FONT>         *  Create a new Contract with a given commodity symbol and contract month.<a name="line.143"></a>
+<FONT color="green">144</FONT>         *  The contract price will default to the standard margin of the commodity.<a name="line.144"></a>
+<FONT color="green">145</FONT>         *<a name="line.145"></a>
+<FONT color="green">146</FONT>         *  @param  symbol  the symbol for the commodity<a name="line.146"></a>
+<FONT color="green">147</FONT>         *  @param  month   the trading month of this contract<a name="line.147"></a>
+<FONT color="green">148</FONT>         */<a name="line.148"></a>
+<FONT color="green">149</FONT>        public Contract(String symbol, String month) {<a name="line.149"></a>
+<FONT color="green">150</FONT>            this(symbol, month, Commodity.bySymbol(symbol).getMargin());<a name="line.150"></a>
+<FONT color="green">151</FONT>        }<a name="line.151"></a>
+<FONT color="green">152</FONT>    <a name="line.152"></a>
+<FONT color="green">153</FONT>        /**<a name="line.153"></a>
+<FONT color="green">154</FONT>         *  Create a new Contract with a given commodity symbol, contract month, and margin.<a name="line.154"></a>
+<FONT color="green">155</FONT>         *<a name="line.155"></a>
+<FONT color="green">156</FONT>         *  @param  symbol  the symbol for the commodity<a name="line.156"></a>
+<FONT color="green">157</FONT>         *  @param  month   the trading month of this contract<a name="line.157"></a>
+<FONT color="green">158</FONT>         *  @param  margin  the margin in dollars<a name="line.158"></a>
+<FONT color="green">159</FONT>         */<a name="line.159"></a>
+<FONT color="green">160</FONT>        public Contract(String symbol, String month, int margin) {<a name="line.160"></a>
+<FONT color="green">161</FONT>            this(0, symbol, month, margin);<a name="line.161"></a>
+<FONT color="green">162</FONT>        }<a name="line.162"></a>
+<FONT color="green">163</FONT>    <a name="line.163"></a>
+<FONT color="green">164</FONT>        /**<a name="line.164"></a>
+<FONT color="green">165</FONT>         *  Create a new contract with a given commodity symbol and contract month and the price the<a name="line.165"></a>
+<FONT color="green">166</FONT>         *  contract costs.<a name="line.166"></a>
+<FONT color="green">167</FONT>         *<a name="line.167"></a>
+<FONT color="green">168</FONT>         *  @param  symbol  the symbol for the commodity<a name="line.168"></a>
+<FONT color="green">169</FONT>         *  @param  month   the trading month of this contract<a name="line.169"></a>
+<FONT color="green">170</FONT>         *  @param  margin  the margin in dollars<a name="line.170"></a>
+<FONT color="green">171</FONT>         */<a name="line.171"></a>
+<FONT color="green">172</FONT>        public Contract(int id, String symbol, String month, int margin) {<a name="line.172"></a>
+<FONT color="green">173</FONT>            this.id     = id;<a name="line.173"></a>
+<FONT color="green">174</FONT>            this.symbol = symbol.trim();<a name="line.174"></a>
+<FONT color="green">175</FONT>            this.month  = month.trim();<a name="line.175"></a>
+<FONT color="green">176</FONT>            this.margin  = margin;<a name="line.176"></a>
+<FONT color="green">177</FONT>            loadPrices();<a name="line.177"></a>
+<FONT color="green">178</FONT>        }<a name="line.178"></a>
+<FONT color="green">179</FONT>    <a name="line.179"></a>
+<FONT color="green">180</FONT>    /* *************************************** */<a name="line.180"></a>
+<FONT color="green">181</FONT>    /* *** GET & SET METHODS               *** */<a name="line.181"></a>
+<FONT color="green">182</FONT>    /* *************************************** */<a name="line.182"></a>
+<FONT color="green">183</FONT>        /**<a name="line.183"></a>
+<FONT color="green">184</FONT>         *  Get the contract's id<a name="line.184"></a>
+<FONT color="green">185</FONT>         *  @return     the id<a name="line.185"></a>
+<FONT color="green">186</FONT>         */<a name="line.186"></a>
+<FONT color="green">187</FONT>        public int getId() { return id; }<a name="line.187"></a>
+<FONT color="green">188</FONT>    <a name="line.188"></a>
+<FONT color="green">189</FONT>        /**<a name="line.189"></a>
+<FONT color="green">190</FONT>         *  Get the commodity symbol for this contract.<a name="line.190"></a>
+<FONT color="green">191</FONT>         *  For example 'C' is the symbol for Corn.<a name="line.191"></a>
+<FONT color="green">192</FONT>         *  @return     the symbol<a name="line.192"></a>
+<FONT color="green">193</FONT>         */<a name="line.193"></a>
+<FONT color="green">194</FONT>        public String getSymbol() { return symbol; }<a name="line.194"></a>
+<FONT color="green">195</FONT>    <a name="line.195"></a>
+<FONT color="green">196</FONT>        /**<a name="line.196"></a>
+<FONT color="green">197</FONT>         *  Get the month of the contract.<a name="line.197"></a>
+<FONT color="green">198</FONT>         *  Format is in YYYYM.<a name="line.198"></a>
+<FONT color="green">199</FONT>         *  @return     the month<a name="line.199"></a>
+<FONT color="green">200</FONT>         */<a name="line.200"></a>
+<FONT color="green">201</FONT>        public String getMonth() { return month; }<a name="line.201"></a>
+<FONT color="green">202</FONT>    <a name="line.202"></a>
+<FONT color="green">203</FONT>        /**<a name="line.203"></a>
+<FONT color="green">204</FONT>         *  Get the month of the contract formatted for output.<a name="line.204"></a>
+<FONT color="green">205</FONT>         *  Format is in 'MMM YY'<a name="line.205"></a>
+<FONT color="green">206</FONT>         *  @return     the formatted month<a name="line.206"></a>
+<FONT color="green">207</FONT>         */<a name="line.207"></a>
+<FONT color="green">208</FONT>        public String getMonthFormatted() {<a name="line.208"></a>
+<FONT color="green">209</FONT>            return Month.bySymbol(month.substring(4,5)).getAbbrev() + " " + month.substring(2,4);<a name="line.209"></a>
+<FONT color="green">210</FONT>        }<a name="line.210"></a>
+<FONT color="green">211</FONT>    <a name="line.211"></a>
+<FONT color="green">212</FONT>        /**<a name="line.212"></a>
+<FONT color="green">213</FONT>         *  Get the month of the contract formatted for comparisons.<a name="line.213"></a>
+<FONT color="green">214</FONT>         *  Format is in YYYYM<a name="line.214"></a>
+<FONT color="green">215</FONT>         *  @return      the formatted month as key<a name="line.215"></a>
+<FONT color="green">216</FONT>         */<a name="line.216"></a>
+<FONT color="green">217</FONT>    //    public String getMonthAsKey() {<a name="line.217"></a>
+<FONT color="green">218</FONT>    //        return month.substring(1).trim() + month.substring(0,1);<a name="line.218"></a>
+<FONT color="green">219</FONT>    //    }<a name="line.219"></a>
+<FONT color="green">220</FONT>    <a name="line.220"></a>
+<FONT color="green">221</FONT>        /**<a name="line.221"></a>
+<FONT color="green">222</FONT>         *  Get the margin of the contract.<a name="line.222"></a>
+<FONT color="green">223</FONT>         *  @return     the margin<a name="line.223"></a>
+<FONT color="green">224</FONT>         */<a name="line.224"></a>
+<FONT color="green">225</FONT>        public int getMargin() { return margin; }<a name="line.225"></a>
+<FONT color="green">226</FONT>    <a name="line.226"></a>
+<FONT color="green">227</FONT>        /**<a name="line.227"></a>
+<FONT color="green">228</FONT>         *  Get the maximum price for the life of the contract.<a name="line.228"></a>
+<FONT color="green">229</FONT>         *  @return     the maximum price<a name="line.229"></a>
+<FONT color="green">230</FONT>         */<a name="line.230"></a>
+<FONT color="green">231</FONT>        public synchronized double getContractHighPrice() {<a name="line.231"></a>
+<FONT color="green">232</FONT>            return maxPrice;<a name="line.232"></a>
+<FONT color="green">233</FONT>        }<a name="line.233"></a>
+<FONT color="green">234</FONT>    <a name="line.234"></a>
+<FONT color="green">235</FONT>        /**<a name="line.235"></a>
+<FONT color="green">236</FONT>         *  Get the minimum price for the life of the contract.<a name="line.236"></a>
+<FONT color="green">237</FONT>         *  @return     the minimum price<a name="line.237"></a>
+<FONT color="green">238</FONT>         */<a name="line.238"></a>
+<FONT color="green">239</FONT>        public synchronized double getContractLowPrice() {<a name="line.239"></a>
+<FONT color="green">240</FONT>            return minPrice;<a name="line.240"></a>
+<FONT color="green">241</FONT>        }<a name="line.241"></a>
+<FONT color="green">242</FONT>    <a name="line.242"></a>
+<FONT color="green">243</FONT>        /**<a name="line.243"></a>
+<FONT color="green">244</FONT>         *  Get the name of the contract in the format of<a name="line.244"></a>
+<FONT color="green">245</FONT>         *  S MMM YY<a name="line.245"></a>
+<FONT color="green">246</FONT>         *  @return     name of contract<a name="line.246"></a>
+<FONT color="green">247</FONT>         */<a name="line.247"></a>
+<FONT color="green">248</FONT>        public String getName() {<a name="line.248"></a>
+<FONT color="green">249</FONT>            return (getSymbol() + " " + getMonthFormatted());<a name="line.249"></a>
+<FONT color="green">250</FONT>        }<a name="line.250"></a>
+<FONT color="green">251</FONT>    <a name="line.251"></a>
+<FONT color="green">252</FONT>        /**<a name="line.252"></a>
+<FONT color="green">253</FONT>         *  Get the most current date of the prices available.<a name="line.253"></a>
+<FONT color="green">254</FONT>         *  @return     the date<a name="line.254"></a>
+<FONT color="green">255</FONT>         */<a name="line.255"></a>
+<FONT color="green">256</FONT>        public synchronized Date getCurrentDate() {<a name="line.256"></a>
+<FONT color="green">257</FONT>            if ((priceList == null) || (priceList.size() == 0)) {<a name="line.257"></a>
+<FONT color="green">258</FONT>                return null;<a name="line.258"></a>
+<FONT color="green">259</FONT>            } else {<a name="line.259"></a>
+<FONT color="green">260</FONT>                return (Date)priceList.lastKey();<a name="line.260"></a>
+<FONT color="green">261</FONT>            }<a name="line.261"></a>
+<FONT color="green">262</FONT>        }<a name="line.262"></a>
+<FONT color="green">263</FONT>    <a name="line.263"></a>
+<FONT color="green">264</FONT>        /**<a name="line.264"></a>
+<FONT color="green">265</FONT>         *  Get the oldest date of the prices available.<a name="line.265"></a>
+<FONT color="green">266</FONT>         *  @return     the date<a name="line.266"></a>
+<FONT color="green">267</FONT>         */<a name="line.267"></a>
+<FONT color="green">268</FONT>        public synchronized Date getOldestDate() {<a name="line.268"></a>
+<FONT color="green">269</FONT>    if (!priceListStatus.isPos3()) {<a name="line.269"></a>
+<FONT color="green">270</FONT>        System.out.println("Contract.getOldestDate() - delayed");<a name="line.270"></a>
+<FONT color="green">271</FONT>    }<a name="line.271"></a>
+<FONT color="green">272</FONT>            while (!priceListStatus.isPos3()) {<a name="line.272"></a>
+<FONT color="green">273</FONT>                synchronized(this) {<a name="line.273"></a>
+<FONT color="green">274</FONT>                    try {<a name="line.274"></a>
+<FONT color="green">275</FONT>                        wait(10);<a name="line.275"></a>
+<FONT color="green">276</FONT>                    } catch (InterruptedException e) {<a name="line.276"></a>
+<FONT color="green">277</FONT>                    }<a name="line.277"></a>
+<FONT color="green">278</FONT>                }<a name="line.278"></a>
+<FONT color="green">279</FONT>            }<a name="line.279"></a>
+<FONT color="green">280</FONT>            if ((priceList == null) || (priceList.size() == 0)) {<a name="line.280"></a>
+<FONT color="green">281</FONT>                return null;<a name="line.281"></a>
+<FONT color="green">282</FONT>            } else {<a name="line.282"></a>
+<FONT color="green">283</FONT>                return (Date)priceList.firstKey();<a name="line.283"></a>
+<FONT color="green">284</FONT>            }<a name="line.284"></a>
+<FONT color="green">285</FONT>        }<a name="line.285"></a>
+<FONT color="green">286</FONT>    <a name="line.286"></a>
+<FONT color="green">287</FONT>        /**<a name="line.287"></a>
+<FONT color="green">288</FONT>         *  Get a reference to the commodity that this contract is for.<a name="line.288"></a>
+<FONT color="green">289</FONT>         *  @return     the commodity<a name="line.289"></a>
+<FONT color="green">290</FONT>         */<a name="line.290"></a>
+<FONT color="green">291</FONT>        public Commodity getCommodity() {<a name="line.291"></a>
+<FONT color="green">292</FONT>            if (commodity == null) {<a name="line.292"></a>
+<FONT color="green">293</FONT>                commodity = Commodity.bySymbol(symbol);<a name="line.293"></a>
+<FONT color="green">294</FONT>            }<a name="line.294"></a>
+<FONT color="green">295</FONT>            return commodity;<a name="line.295"></a>
+<FONT color="green">296</FONT>        }<a name="line.296"></a>
+<FONT color="green">297</FONT>    <a name="line.297"></a>
+<FONT color="green">298</FONT>        /**<a name="line.298"></a>
+<FONT color="green">299</FONT>         *  Set the contract id.<a name="line.299"></a>
+<FONT color="green">300</FONT>         *  @param  id      contract id<a name="line.300"></a>
+<FONT color="green">301</FONT>         */<a name="line.301"></a>
+<FONT color="green">302</FONT>        public void setId(int id) {<a name="line.302"></a>
+<FONT color="green">303</FONT>            this.id = id;<a name="line.303"></a>
+<FONT color="green">304</FONT>        }<a name="line.304"></a>
+<FONT color="green">305</FONT>    <a name="line.305"></a>
+<FONT color="green">306</FONT>        /**<a name="line.306"></a>
+<FONT color="green">307</FONT>         *  Set the contract's margin.<a name="line.307"></a>
+<FONT color="green">308</FONT>         *  @param  margin  the margin in dollars<a name="line.308"></a>
+<FONT color="green">309</FONT>         */<a name="line.309"></a>
+<FONT color="green">310</FONT>        public void setMargin(int margin) {<a name="line.310"></a>
+<FONT color="green">311</FONT>            this.margin = margin;<a name="line.311"></a>
+<FONT color="green">312</FONT>        }<a name="line.312"></a>
+<FONT color="green">313</FONT>    <a name="line.313"></a>
+<FONT color="green">314</FONT>    /* *************************************** */<a name="line.314"></a>
+<FONT color="green">315</FONT>    /* *** INSTANCE METHODS                *** */<a name="line.315"></a>
+<FONT color="green">316</FONT>    /* *************************************** */<a name="line.316"></a>
+<FONT color="green">317</FONT>        /**<a name="line.317"></a>
+<FONT color="green">318</FONT>         *  Add new prices to this contract.  These prices will be stored.<a name="line.318"></a>
+<FONT color="green">319</FONT>         *<a name="line.319"></a>
+<FONT color="green">320</FONT>         *  @param  prices  the new prices<a name="line.320"></a>
+<FONT color="green">321</FONT>         */<a name="line.321"></a>
+<FONT color="green">322</FONT>        public synchronized void addPrices(Prices prices) {<a name="line.322"></a>
+<FONT color="green">323</FONT>            try {<a name="line.323"></a>
+<FONT color="green">324</FONT>                dataManager.addDailyPrice(this, prices);<a name="line.324"></a>
+<FONT color="green">325</FONT>    /*<a name="line.325"></a>
+<FONT color="green">326</FONT>                if ((currentPrices == null) || (prices.getDate() > currentPrices.getDate())) {<a name="line.326"></a>
+<FONT color="green">327</FONT>                    currentPrices = prices;<a name="line.327"></a>
+<FONT color="green">328</FONT>                }<a name="line.328"></a>
+<FONT color="green">329</FONT>    */<a name="line.329"></a>
+<FONT color="green">330</FONT>                if (prices.getHigh() > maxPrice) {<a name="line.330"></a>
+<FONT color="green">331</FONT>                    maxPrice = prices.getHigh();<a name="line.331"></a>
+<FONT color="green">332</FONT>                }<a name="line.332"></a>
+<FONT color="green">333</FONT>                if (prices.getLow() &lt; minPrice) {<a name="line.333"></a>
+<FONT color="green">334</FONT>                    minPrice = prices.getLow();<a name="line.334"></a>
+<FONT color="green">335</FONT>                }<a name="line.335"></a>
+<FONT color="green">336</FONT>    <a name="line.336"></a>
+<FONT color="green">337</FONT>                priceList.put(prices.getDate(), prices);<a name="line.337"></a>
+<FONT color="green">338</FONT>    //System.out.println("firePricesUpdated #2");<a name="line.338"></a>
+<FONT color="green">339</FONT>                firePricesUpdated(prices);<a name="line.339"></a>
+<FONT color="green">340</FONT>            } catch (IOException e) {<a name="line.340"></a>
+<FONT color="green">341</FONT>                // Data was already inserted for this day<a name="line.341"></a>
+<FONT color="green">342</FONT>            }<a name="line.342"></a>
+<FONT color="green">343</FONT>        }<a name="line.343"></a>
+<FONT color="green">344</FONT>    <a name="line.344"></a>
+<FONT color="green">345</FONT>        /**<a name="line.345"></a>
+<FONT color="green">346</FONT>         *  Get the current Prices of this contract.<a name="line.346"></a>
+<FONT color="green">347</FONT>         *<a name="line.347"></a>
+<FONT color="green">348</FONT>         *  @return The current Prices of this contract.<a name="line.348"></a>
+<FONT color="green">349</FONT>         */<a name="line.349"></a>
+<FONT color="green">350</FONT>        public synchronized Prices getPrices() {<a name="line.350"></a>
+<FONT color="green">351</FONT>    if (!priceListStatus.isPos3()) {<a name="line.351"></a>
+<FONT color="green">352</FONT>        System.out.println("Contract.getPrices() - delayed");<a name="line.352"></a>
+<FONT color="green">353</FONT>    }<a name="line.353"></a>
+<FONT color="green">354</FONT>            if (currentPrices == null) {<a name="line.354"></a>
+<FONT color="green">355</FONT>                try {<a name="line.355"></a>
+<FONT color="green">356</FONT>                    currentPrices = dataManager.getCurrentPrices(id);<a name="line.356"></a>
+<FONT color="green">357</FONT>                } catch (IOException e) {<a name="line.357"></a>
+<FONT color="green">358</FONT>                    e.printStackTrace();<a name="line.358"></a>
+<FONT color="green">359</FONT>                }<a name="line.359"></a>
+<FONT color="green">360</FONT>            }<a name="line.360"></a>
+<FONT color="green">361</FONT>            return currentPrices;<a name="line.361"></a>
+<FONT color="green">362</FONT>        }<a name="line.362"></a>
+<FONT color="green">363</FONT>    <a name="line.363"></a>
+<FONT color="green">364</FONT>        /**<a name="line.364"></a>
+<FONT color="green">365</FONT>         *  Get the Prices for the given date of this contract.<a name="line.365"></a>
+<FONT color="green">366</FONT>         *<a name="line.366"></a>
+<FONT color="green">367</FONT>         *  @param  date    The date to retrieve the prices for.<a name="line.367"></a>
+<FONT color="green">368</FONT>         *  @return     the Prices for the given date.<a name="line.368"></a>
+<FONT color="green">369</FONT>         */<a name="line.369"></a>
+<FONT color="green">370</FONT>        public synchronized Prices getPrices(java.util.Date date) {<a name="line.370"></a>
+<FONT color="green">371</FONT>    if (!priceListStatus.isPos3()) {<a name="line.371"></a>
+<FONT color="green">372</FONT>        System.out.println("Contract.getPrices() - delayed");<a name="line.372"></a>
+<FONT color="green">373</FONT>    }<a name="line.373"></a>
+<FONT color="green">374</FONT>            if (currentPrices == null) {<a name="line.374"></a>
+<FONT color="green">375</FONT>                getPrices();<a name="line.375"></a>
+<FONT color="green">376</FONT>            }<a name="line.376"></a>
+<FONT color="green">377</FONT>            while (!priceListStatus.isPos3()) {<a name="line.377"></a>
+<FONT color="green">378</FONT>                synchronized(this) {<a name="line.378"></a>
+<FONT color="green">379</FONT>                    try {<a name="line.379"></a>
+<FONT color="green">380</FONT>                        wait(10);<a name="line.380"></a>
+<FONT color="green">381</FONT>                    } catch (InterruptedException e) {<a name="line.381"></a>
+<FONT color="green">382</FONT>                    }<a name="line.382"></a>
+<FONT color="green">383</FONT>                }<a name="line.383"></a>
+<FONT color="green">384</FONT>            }<a name="line.384"></a>
+<FONT color="green">385</FONT>            if ((priceList == null) || (priceList.size() == 0)) {<a name="line.385"></a>
+<FONT color="green">386</FONT>                return null;<a name="line.386"></a>
+<FONT color="green">387</FONT>            } else {<a name="line.387"></a>
+<FONT color="green">388</FONT>                return (Prices)priceList.get(date);<a name="line.388"></a>
+<FONT color="green">389</FONT>            }<a name="line.389"></a>
+<FONT color="green">390</FONT>        }<a name="line.390"></a>
+<FONT color="green">391</FONT>    <a name="line.391"></a>
+<FONT color="green">392</FONT>        /**<a name="line.392"></a>
+<FONT color="green">393</FONT>         *  Get the closest Prices for the given date of this contract.  If date<a name="line.393"></a>
+<FONT color="green">394</FONT>         *  has a price, then that date's prices will be returned.  If date<a name="line.394"></a>
+<FONT color="green">395</FONT>         *  does not have prices, then the previous price closes to that date<a name="line.395"></a>
+<FONT color="green">396</FONT>         *  is returned.<a name="line.396"></a>
+<FONT color="green">397</FONT>         *<a name="line.397"></a>
+<FONT color="green">398</FONT>         *  @param  date    the date to retrieve the prices for<a name="line.398"></a>
+<FONT color="green">399</FONT>         *  @return     the nearest Prices to the date<a name="line.399"></a>
+<FONT color="green">400</FONT>         */<a name="line.400"></a>
+<FONT color="green">401</FONT>        public synchronized Prices getNearestPrices(java.util.Date date) {<a name="line.401"></a>
+<FONT color="green">402</FONT>            Prices prices = getPrices(date);<a name="line.402"></a>
+<FONT color="green">403</FONT>    <a name="line.403"></a>
+<FONT color="green">404</FONT>            if (prices == null && date != null) {<a name="line.404"></a>
+<FONT color="green">405</FONT>                int countDown = 7;<a name="line.405"></a>
+<FONT color="green">406</FONT>                CommodityCalendar calendar = new CommodityCalendar(date);<a name="line.406"></a>
+<FONT color="green">407</FONT>                do {<a name="line.407"></a>
+<FONT color="green">408</FONT>                    calendar.addWeekDays(-1);<a name="line.408"></a>
+<FONT color="green">409</FONT>                    prices = getPrices(calendar.getTime());<a name="line.409"></a>
+<FONT color="green">410</FONT>                } while ((prices == null) || (countDown-- > 0));<a name="line.410"></a>
+<FONT color="green">411</FONT>            }<a name="line.411"></a>
+<FONT color="green">412</FONT>            return prices;<a name="line.412"></a>
+<FONT color="green">413</FONT>        }<a name="line.413"></a>
+<FONT color="green">414</FONT>    <a name="line.414"></a>
+<FONT color="green">415</FONT>        /**<a name="line.415"></a>
+<FONT color="green">416</FONT>         *  Returns if the date is an actual date or a nearest date.<a name="line.416"></a>
+<FONT color="green">417</FONT>         *<a name="line.417"></a>
+<FONT color="green">418</FONT>         *  @param  date    the date to check<a name="line.418"></a>
+<FONT color="green">419</FONT>         *  @return     true if actual date of prices or false if date was nearest date.<a name="line.419"></a>
+<FONT color="green">420</FONT>         */<a name="line.420"></a>
+<FONT color="green">421</FONT>        public boolean isActualPriceDate(java.util.Date date) {<a name="line.421"></a>
+<FONT color="green">422</FONT>    if (!priceListStatus.isPos3()) {<a name="line.422"></a>
+<FONT color="green">423</FONT>        System.out.println("Contract.isActualPriceDate() - delayed");<a name="line.423"></a>
+<FONT color="green">424</FONT>    }<a name="line.424"></a>
+<FONT color="green">425</FONT>            while (!priceListStatus.isPos3()) {<a name="line.425"></a>
+<FONT color="green">426</FONT>                synchronized(this) {<a name="line.426"></a>
+<FONT color="green">427</FONT>                    try {<a name="line.427"></a>
+<FONT color="green">428</FONT>                        wait(10);<a name="line.428"></a>
+<FONT color="green">429</FONT>                    } catch (InterruptedException e) {<a name="line.429"></a>
+<FONT color="green">430</FONT>                    }<a name="line.430"></a>
+<FONT color="green">431</FONT>                }<a name="line.431"></a>
+<FONT color="green">432</FONT>            }<a name="line.432"></a>
+<FONT color="green">433</FONT>            if ((priceList == null) || (priceList.size() == 0)) {<a name="line.433"></a>
+<FONT color="green">434</FONT>                return false;<a name="line.434"></a>
+<FONT color="green">435</FONT>            } else {<a name="line.435"></a>
+<FONT color="green">436</FONT>                return !(priceList.get(date) == null);<a name="line.436"></a>
+<FONT color="green">437</FONT>            }<a name="line.437"></a>
+<FONT color="green">438</FONT>        }<a name="line.438"></a>
+<FONT color="green">439</FONT>    <a name="line.439"></a>
+<FONT color="green">440</FONT>        /**<a name="line.440"></a>
+<FONT color="green">441</FONT>         *  Get all of the Prices for this contract.<a name="line.441"></a>
+<FONT color="green">442</FONT>         *<a name="line.442"></a>
+<FONT color="green">443</FONT>         *  @return the Prices of this contract.<a name="line.443"></a>
+<FONT color="green">444</FONT>         */<a name="line.444"></a>
+<FONT color="green">445</FONT>        public synchronized Map getPriceList() {<a name="line.445"></a>
+<FONT color="green">446</FONT>    if (!priceListStatus.isPos3()) {<a name="line.446"></a>
+<FONT color="green">447</FONT>        System.out.println("Contract.getPriceList() - delayed");<a name="line.447"></a>
+<FONT color="green">448</FONT>    }<a name="line.448"></a>
+<FONT color="green">449</FONT>            while (!priceListStatus.isPos3()) {<a name="line.449"></a>
+<FONT color="green">450</FONT>                synchronized(this) {<a name="line.450"></a>
+<FONT color="green">451</FONT>                    try {<a name="line.451"></a>
+<FONT color="green">452</FONT>                        wait(10);<a name="line.452"></a>
+<FONT color="green">453</FONT>                    } catch (InterruptedException e) {<a name="line.453"></a>
+<FONT color="green">454</FONT>                    }<a name="line.454"></a>
+<FONT color="green">455</FONT>                }<a name="line.455"></a>
+<FONT color="green">456</FONT>            }<a name="line.456"></a>
+<FONT color="green">457</FONT>            if (priceList == null) {<a name="line.457"></a>
+<FONT color="green">458</FONT>                loadPrices();<a name="line.458"></a>
+<FONT color="green">459</FONT>            }<a name="line.459"></a>
+<FONT color="green">460</FONT>            return priceList;<a name="line.460"></a>
+<FONT color="green">461</FONT>        }<a name="line.461"></a>
+<FONT color="green">462</FONT>    <a name="line.462"></a>
+<FONT color="green">463</FONT>        /**<a name="line.463"></a>
+<FONT color="green">464</FONT>         *  Get all of the Price date keys in a ListIterator format<a name="line.464"></a>
+<FONT color="green">465</FONT>         *  for forwards and backwards traversal of the list.<a name="line.465"></a>
+<FONT color="green">466</FONT>         *<a name="line.466"></a>
+<FONT color="green">467</FONT>         *  A descending (Contract.DESCENDING) list will begin at the most current date and<a name="line.467"></a>
+<FONT color="green">468</FONT>         *  should be traversed backwards (previous).<a name="line.468"></a>
+<FONT color="green">469</FONT>         *  An ascending list (Contract.ASCENDING) will begin at the earliest<a name="line.469"></a>
+<FONT color="green">470</FONT>         *  available date and should be traversed forwards (next).<a name="line.470"></a>
+<FONT color="green">471</FONT>         *<a name="line.471"></a>
+<FONT color="green">472</FONT>         *  This ListIterator cannot have objects added or removed from it.<a name="line.472"></a>
+<FONT color="green">473</FONT>         *<a name="line.473"></a>
+<FONT color="green">474</FONT>         *  @param  order   The order (ascending or decending) to return the list in.<a name="line.474"></a>
+<FONT color="green">475</FONT>         *  @return the ListIterator of keys.<a name="line.475"></a>
+<FONT color="green">476</FONT>         */<a name="line.476"></a>
+<FONT color="green">477</FONT>        public synchronized ListIterator getPriceDates(boolean order) {<a name="line.477"></a>
+<FONT color="green">478</FONT>            if (order) {<a name="line.478"></a>
+<FONT color="green">479</FONT>                return priceList.listIterator(priceList.size());<a name="line.479"></a>
+<FONT color="green">480</FONT>            } else {<a name="line.480"></a>
+<FONT color="green">481</FONT>                return priceList.listIterator(0);<a name="line.481"></a>
+<FONT color="green">482</FONT>            }<a name="line.482"></a>
+<FONT color="green">483</FONT>        }<a name="line.483"></a>
+<FONT color="green">484</FONT>    <a name="line.484"></a>
+<FONT color="green">485</FONT>        /**<a name="line.485"></a>
+<FONT color="green">486</FONT>         *  Load the prices from the database and determin the minimum<a name="line.486"></a>
+<FONT color="green">487</FONT>         *  and maximum prices for the contract.<a name="line.487"></a>
+<FONT color="green">488</FONT>         */<a name="line.488"></a>
+<FONT color="green">489</FONT>        private synchronized void loadPrices() {<a name="line.489"></a>
+<FONT color="green">490</FONT>            priceThreadPool.runTask(new LoadThread());<a name="line.490"></a>
+<FONT color="green">491</FONT>        }<a name="line.491"></a>
+<FONT color="green">492</FONT>    <a name="line.492"></a>
+<FONT color="green">493</FONT>        /**<a name="line.493"></a>
+<FONT color="green">494</FONT>         *  Make this contract the selected contract for all listeners.<a name="line.494"></a>
+<FONT color="green">495</FONT>         */<a name="line.495"></a>
+<FONT color="green">496</FONT>        public void select() {<a name="line.496"></a>
+<FONT color="green">497</FONT>            if (selectedContract != this) {<a name="line.497"></a>
+<FONT color="green">498</FONT>                selectedContract = this;<a name="line.498"></a>
+<FONT color="green">499</FONT>                fireSelectionUpdated();<a name="line.499"></a>
+<FONT color="green">500</FONT>            }<a name="line.500"></a>
+<FONT color="green">501</FONT>        }<a name="line.501"></a>
+<FONT color="green">502</FONT>    <a name="line.502"></a>
+<FONT color="green">503</FONT>        /**<a name="line.503"></a>
+<FONT color="green">504</FONT>         *  Get the best tests for short term analysis of this contract.<a name="line.504"></a>
+<FONT color="green">505</FONT>         *<a name="line.505"></a>
+<FONT color="green">506</FONT>         *  @return     tests for short term analysis<a name="line.506"></a>
+<FONT color="green">507</FONT>         */<a name="line.507"></a>
+<FONT color="green">508</FONT>        public Collection getBestShortTermTests() {<a name="line.508"></a>
+<FONT color="green">509</FONT>            if (shortTermBestTests == null) {<a name="line.509"></a>
+<FONT color="green">510</FONT>                try {<a name="line.510"></a>
+<FONT color="green">511</FONT>                    shortTermBestTests = dataManager.getBestTestXref(this, TechnicalTestInterface.SHORT_TERM, 0, NUMBER_OF_BEST_TESTS);<a name="line.511"></a>
+<FONT color="green">512</FONT>                } catch (IOException e) {<a name="line.512"></a>
+<FONT color="green">513</FONT>                    shortTermBestTests = new HashSet();<a name="line.513"></a>
+<FONT color="green">514</FONT>                }<a name="line.514"></a>
+<FONT color="green">515</FONT>            }<a name="line.515"></a>
+<FONT color="green">516</FONT>            return shortTermBestTests;<a name="line.516"></a>
+<FONT color="green">517</FONT>        }<a name="line.517"></a>
+<FONT color="green">518</FONT>    <a name="line.518"></a>
+<FONT color="green">519</FONT>        /**<a name="line.519"></a>
+<FONT color="green">520</FONT>         *  Get the best tests for medium term analysis of this contract.<a name="line.520"></a>
+<FONT color="green">521</FONT>         *<a name="line.521"></a>
+<FONT color="green">522</FONT>         *  @return     tests for medium term analysis<a name="line.522"></a>
+<FONT color="green">523</FONT>         */<a name="line.523"></a>
+<FONT color="green">524</FONT>        public Collection getBestMediumTermTests() {<a name="line.524"></a>
+<FONT color="green">525</FONT>            if (mediumTermBestTests == null) {<a name="line.525"></a>
+<FONT color="green">526</FONT>                try {<a name="line.526"></a>
+<FONT color="green">527</FONT>                    mediumTermBestTests = dataManager.getBestTestXref(this, TechnicalTestInterface.MEDIUM_TERM, TechnicalTestInterface.SHORT_TERM, NUMBER_OF_BEST_TESTS);<a name="line.527"></a>
+<FONT color="green">528</FONT>                } catch (IOException e) {<a name="line.528"></a>
+<FONT color="green">529</FONT>                    mediumTermBestTests = new HashSet();<a name="line.529"></a>
+<FONT color="green">530</FONT>                }<a name="line.530"></a>
+<FONT color="green">531</FONT>            }<a name="line.531"></a>
+<FONT color="green">532</FONT>            return mediumTermBestTests;<a name="line.532"></a>
+<FONT color="green">533</FONT>        }<a name="line.533"></a>
+<FONT color="green">534</FONT>    <a name="line.534"></a>
+<FONT color="green">535</FONT>        /**<a name="line.535"></a>
+<FONT color="green">536</FONT>         *  Get the best tests for long term analysis of this contract.<a name="line.536"></a>
+<FONT color="green">537</FONT>         *<a name="line.537"></a>
+<FONT color="green">538</FONT>         *  @return     tests for long term analysis<a name="line.538"></a>
+<FONT color="green">539</FONT>         */<a name="line.539"></a>
+<FONT color="green">540</FONT>        public Collection getBestLongTermTests() {<a name="line.540"></a>
+<FONT color="green">541</FONT>            if (longTermBestTests == null) {<a name="line.541"></a>
+<FONT color="green">542</FONT>                try {<a name="line.542"></a>
+<FONT color="green">543</FONT>                    longTermBestTests = dataManager.getBestTestXref(this, TechnicalTestInterface.LONG_TERM, TechnicalTestInterface.MEDIUM_TERM, NUMBER_OF_BEST_TESTS);<a name="line.543"></a>
+<FONT color="green">544</FONT>                } catch (IOException e) {<a name="line.544"></a>
+<FONT color="green">545</FONT>                    longTermBestTests = new HashSet();<a name="line.545"></a>
+<FONT color="green">546</FONT>                }<a name="line.546"></a>
+<FONT color="green">547</FONT>            }<a name="line.547"></a>
+<FONT color="green">548</FONT>            return longTermBestTests;<a name="line.548"></a>
+<FONT color="green">549</FONT>        }<a name="line.549"></a>
+<FONT color="green">550</FONT>    <a name="line.550"></a>
+<FONT color="green">551</FONT>        /**<a name="line.551"></a>
+<FONT color="green">552</FONT>         *  Clear the best tests analysis of this contract.<a name="line.552"></a>
+<FONT color="green">553</FONT>         */<a name="line.553"></a>
+<FONT color="green">554</FONT>        public void clearBestTests() {<a name="line.554"></a>
+<FONT color="green">555</FONT>            shortTermBestTests  = null;<a name="line.555"></a>
+<FONT color="green">556</FONT>            mediumTermBestTests = null;<a name="line.556"></a>
+<FONT color="green">557</FONT>            longTermBestTests   = null;<a name="line.557"></a>
+<FONT color="green">558</FONT>        }<a name="line.558"></a>
+<FONT color="green">559</FONT>    <a name="line.559"></a>
+<FONT color="green">560</FONT>        /**<a name="line.560"></a>
+<FONT color="green">561</FONT>         *  Get the critical high price points for this contract.<a name="line.561"></a>
+<FONT color="green">562</FONT>         *<a name="line.562"></a>
+<FONT color="green">563</FONT>         *  @return     collection of the critical high price points<a name="line.563"></a>
+<FONT color="green">564</FONT>         */<a name="line.564"></a>
+<FONT color="green">565</FONT>         public Collection getHighPricePoints() {<a name="line.565"></a>
+<FONT color="green">566</FONT>            if (highPricePoints == null) {<a name="line.566"></a>
+<FONT color="green">567</FONT>                highPricePoints = CriticalPricePointAnalyzer.instance().getHighPricePoints(this);<a name="line.567"></a>
+<FONT color="green">568</FONT>            }<a name="line.568"></a>
+<FONT color="green">569</FONT>            return highPricePoints;<a name="line.569"></a>
+<FONT color="green">570</FONT>        }<a name="line.570"></a>
+<FONT color="green">571</FONT>    <a name="line.571"></a>
+<FONT color="green">572</FONT>        /**<a name="line.572"></a>
+<FONT color="green">573</FONT>         *  Get the critical low price points for this contract.<a name="line.573"></a>
+<FONT color="green">574</FONT>         *<a name="line.574"></a>
+<FONT color="green">575</FONT>         *  @return     collection of the critical low price points<a name="line.575"></a>
+<FONT color="green">576</FONT>         */<a name="line.576"></a>
+<FONT color="green">577</FONT>         public Collection getLowPricePoints() {<a name="line.577"></a>
+<FONT color="green">578</FONT>            if (lowPricePoints == null) {<a name="line.578"></a>
+<FONT color="green">579</FONT>                lowPricePoints = CriticalPricePointAnalyzer.instance().getLowPricePoints(this);<a name="line.579"></a>
+<FONT color="green">580</FONT>            }<a name="line.580"></a>
+<FONT color="green">581</FONT>            return lowPricePoints;<a name="line.581"></a>
+<FONT color="green">582</FONT>        }<a name="line.582"></a>
+<FONT color="green">583</FONT>    <a name="line.583"></a>
+<FONT color="green">584</FONT>        /**<a name="line.584"></a>
+<FONT color="green">585</FONT>         *  Get the critical high and low price points for this contract.<a name="line.585"></a>
+<FONT color="green">586</FONT>         *<a name="line.586"></a>
+<FONT color="green">587</FONT>         *  @return     collection of the critical high and low price points<a name="line.587"></a>
+<FONT color="green">588</FONT>         */<a name="line.588"></a>
+<FONT color="green">589</FONT>         public Collection getHighLowPricePoints() {<a name="line.589"></a>
+<FONT color="green">590</FONT>            if (highLowPricePoints == null) {<a name="line.590"></a>
+<FONT color="green">591</FONT>                highLowPricePoints = CriticalPricePointAnalyzer.instance().getHighLowPricePoints(this);<a name="line.591"></a>
+<FONT color="green">592</FONT>            }<a name="line.592"></a>
+<FONT color="green">593</FONT>            return highLowPricePoints;<a name="line.593"></a>
+<FONT color="green">594</FONT>        }<a name="line.594"></a>
+<FONT color="green">595</FONT>    <a name="line.595"></a>
+<FONT color="green">596</FONT>        /**<a name="line.596"></a>
+<FONT color="green">597</FONT>         *  Clear the critical price point collections<a name="line.597"></a>
+<FONT color="green">598</FONT>         */<a name="line.598"></a>
+<FONT color="green">599</FONT>        public void clearCriticalPricePoints() {<a name="line.599"></a>
+<FONT color="green">600</FONT>            highPricePoints  = null;<a name="line.600"></a>
+<FONT color="green">601</FONT>            lowPricePoints = null;<a name="line.601"></a>
+<FONT color="green">602</FONT>            highLowPricePoints = null;<a name="line.602"></a>
+<FONT color="green">603</FONT>        }<a name="line.603"></a>
+<FONT color="green">604</FONT>    <a name="line.604"></a>
+<FONT color="green">605</FONT>    /* ***---------------------------------*** */<a name="line.605"></a>
+<FONT color="green">606</FONT>    /* *** EVENT LISTENER METHODS          *** */<a name="line.606"></a>
+<FONT color="green">607</FONT>    /* ***---------------------------------*** */<a name="line.607"></a>
+<FONT color="green">608</FONT>        /**<a name="line.608"></a>
+<FONT color="green">609</FONT>         *  Add a listener for displaying price changes.<a name="line.609"></a>
+<FONT color="green">610</FONT>         *<a name="line.610"></a>
+<FONT color="green">611</FONT>         *  @param  listener    a PriceDisplayListener<a name="line.611"></a>
+<FONT color="green">612</FONT>         */<a name="line.612"></a>
+<FONT color="green">613</FONT>        public void addDisplayListener(PriceDisplayListener listener) {<a name="line.613"></a>
+<FONT color="green">614</FONT>            priceDisplayListeners.add(listener);<a name="line.614"></a>
+<FONT color="green">615</FONT>        }<a name="line.615"></a>
+<FONT color="green">616</FONT>    <a name="line.616"></a>
+<FONT color="green">617</FONT>        /**<a name="line.617"></a>
+<FONT color="green">618</FONT>         *  Remove a listener from displaying price changes.<a name="line.618"></a>
+<FONT color="green">619</FONT>         *<a name="line.619"></a>
+<FONT color="green">620</FONT>         *  @param  listener    a PriceDisplayListener<a name="line.620"></a>
+<FONT color="green">621</FONT>         */<a name="line.621"></a>
+<FONT color="green">622</FONT>        public void removeDisplayListener(PriceDisplayListener listener) {<a name="line.622"></a>
+<FONT color="green">623</FONT>            priceDisplayListeners.remove(listener);<a name="line.623"></a>
+<FONT color="green">624</FONT>        }<a name="line.624"></a>
+<FONT color="green">625</FONT>    <a name="line.625"></a>
+<FONT color="green">626</FONT>        /**<a name="line.626"></a>
+<FONT color="green">627</FONT>         *  Clear all listeners for displaying price changes.<a name="line.627"></a>
+<FONT color="green">628</FONT>         */<a name="line.628"></a>
+<FONT color="green">629</FONT>        public void clearDisplayListeners() {<a name="line.629"></a>
+<FONT color="green">630</FONT>            priceDisplayListeners.clear();<a name="line.630"></a>
+<FONT color="green">631</FONT>        }<a name="line.631"></a>
+<FONT color="green">632</FONT>    <a name="line.632"></a>
+<FONT color="green">633</FONT>        /**<a name="line.633"></a>
+<FONT color="green">634</FONT>         *  Broadcast prices to all PriceDisplayListeners.<a name="line.634"></a>
+<FONT color="green">635</FONT>         *<a name="line.635"></a>
+<FONT color="green">636</FONT>         *  @param  prices  the prices to display<a name="line.636"></a>
+<FONT color="green">637</FONT>         */<a name="line.637"></a>
+<FONT color="green">638</FONT>        public void broadcastDisplayListeners(Prices prices) {<a name="line.638"></a>
+<FONT color="green">639</FONT>            PriceDisplayEvent event = new PriceDisplayEvent(this, prices);<a name="line.639"></a>
+<FONT color="green">640</FONT>    <a name="line.640"></a>
+<FONT color="green">641</FONT>            Iterator it = priceDisplayListeners.iterator();<a name="line.641"></a>
+<FONT color="green">642</FONT>            while (it.hasNext()) {<a name="line.642"></a>
+<FONT color="green">643</FONT>                PriceDisplayListener listener = (PriceDisplayListener)it.next();<a name="line.643"></a>
+<FONT color="green">644</FONT>                listener.displayPrices(event);<a name="line.644"></a>
+<FONT color="green">645</FONT>            }<a name="line.645"></a>
+<FONT color="green">646</FONT>        }<a name="line.646"></a>
+<FONT color="green">647</FONT>    <a name="line.647"></a>
+<FONT color="green">648</FONT>        /**<a name="line.648"></a>
+<FONT color="green">649</FONT>         *  Add a listener for price changes.<a name="line.649"></a>
+<FONT color="green">650</FONT>         *<a name="line.650"></a>
+<FONT color="green">651</FONT>         *  @param  listener    a PriceListener<a name="line.651"></a>
+<FONT color="green">652</FONT>         */<a name="line.652"></a>
+<FONT color="green">653</FONT>        public void addPriceListener(PriceListener listener) {<a name="line.653"></a>
+<FONT color="green">654</FONT>            if (!priceListeners.contains(listener)) {<a name="line.654"></a>
+<FONT color="green">655</FONT>                priceListeners.add(listener);<a name="line.655"></a>
+<FONT color="green">656</FONT>                if (getCurrentDate() != null) {<a name="line.656"></a>
+<FONT color="green">657</FONT>                    firePricesUpdated(listener, getCurrentDate());<a name="line.657"></a>
+<FONT color="green">658</FONT>                }<a name="line.658"></a>
+<FONT color="green">659</FONT>            }<a name="line.659"></a>
+<FONT color="green">660</FONT>        }<a name="line.660"></a>
+<FONT color="green">661</FONT>    <a name="line.661"></a>
+<FONT color="green">662</FONT>        /**<a name="line.662"></a>
+<FONT color="green">663</FONT>         *  Remove a listener from price changes.<a name="line.663"></a>
+<FONT color="green">664</FONT>         *<a name="line.664"></a>
+<FONT color="green">665</FONT>         *  @param  listener    a PriceListener<a name="line.665"></a>
+<FONT color="green">666</FONT>         */<a name="line.666"></a>
+<FONT color="green">667</FONT>        public void removePriceListener(PriceListener listener) {<a name="line.667"></a>
+<FONT color="green">668</FONT>            priceListeners.remove(listener);<a name="line.668"></a>
+<FONT color="green">669</FONT>        }<a name="line.669"></a>
+<FONT color="green">670</FONT>    <a name="line.670"></a>
+<FONT color="green">671</FONT>        /**<a name="line.671"></a>
+<FONT color="green">672</FONT>         *  Clear all listeners for price changes.<a name="line.672"></a>
+<FONT color="green">673</FONT>         */<a name="line.673"></a>
+<FONT color="green">674</FONT>        public void clearPriceListeners() {<a name="line.674"></a>
+<FONT color="green">675</FONT>            priceListeners.clear();<a name="line.675"></a>
+<FONT color="green">676</FONT>        }<a name="line.676"></a>
+<FONT color="green">677</FONT>    <a name="line.677"></a>
+<FONT color="green">678</FONT>        /**<a name="line.678"></a>
+<FONT color="green">679</FONT>         *  Fire all price information for a date to all PriceListeners.<a name="line.679"></a>
+<FONT color="green">680</FONT>         *<a name="line.680"></a>
+<FONT color="green">681</FONT>         *  @param  date  the date of prices to display<a name="line.681"></a>
+<FONT color="green">682</FONT>         */<a name="line.682"></a>
+<FONT color="green">683</FONT>        public void firePricesUpdated(java.util.Date date) {<a name="line.683"></a>
+<FONT color="green">684</FONT>            if ((date != null) && (!date.equals(lastFiredDate))) {<a name="line.684"></a>
+<FONT color="green">685</FONT>                firePricesUpdated(getNearestPrices(date));<a name="line.685"></a>
+<FONT color="green">686</FONT>                lastFiredDate = date;<a name="line.686"></a>
+<FONT color="green">687</FONT>            }<a name="line.687"></a>
+<FONT color="green">688</FONT>        }<a name="line.688"></a>
+<FONT color="green">689</FONT>    <a name="line.689"></a>
+<FONT color="green">690</FONT>        /**<a name="line.690"></a>
+<FONT color="green">691</FONT>         *  Fire all price information to all PriceListeners.<a name="line.691"></a>
+<FONT color="green">692</FONT>         *<a name="line.692"></a>
+<FONT color="green">693</FONT>         *  @param  date  the date of prices to display<a name="line.693"></a>
+<FONT color="green">694</FONT>         */<a name="line.694"></a>
+<FONT color="green">695</FONT>        public void firePricesUpdated(Prices prices) {<a name="line.695"></a>
+<FONT color="green">696</FONT>            PriceEvent dateEvent    = new PriceEvent(this, prices.getDate(), prices.getDate());<a name="line.696"></a>
+<FONT color="green">697</FONT>            PriceEvent openEvent    = new PriceEvent(this, prices.getDate(), prices.getOpenObject());<a name="line.697"></a>
+<FONT color="green">698</FONT>            PriceEvent highEvent    = new PriceEvent(this, prices.getDate(), prices.getHighObject());<a name="line.698"></a>
+<FONT color="green">699</FONT>            PriceEvent lowEvent     = new PriceEvent(this, prices.getDate(), prices.getLowObject());<a name="line.699"></a>
+<FONT color="green">700</FONT>            PriceEvent closeEvent   = new PriceEvent(this, prices.getDate(), prices.getCloseObject());<a name="line.700"></a>
+<FONT color="green">701</FONT>            PriceEvent interestEvent = new PriceEvent(this, prices.getDate(), prices.getInterestObject());<a name="line.701"></a>
+<FONT color="green">702</FONT>            PriceEvent volumeEvent  = new PriceEvent(this, prices.getDate(), prices.getVolumeObject());<a name="line.702"></a>
+<FONT color="green">703</FONT>    <a name="line.703"></a>
+<FONT color="green">704</FONT>            Iterator it = priceListeners.iterator();<a name="line.704"></a>
+<FONT color="green">705</FONT>            while (it.hasNext()) {<a name="line.705"></a>
+<FONT color="green">706</FONT>                PriceListener listener = (PriceListener)it.next();<a name="line.706"></a>
+<FONT color="green">707</FONT>                listener.changeDate(dateEvent);<a name="line.707"></a>
+<FONT color="green">708</FONT>                listener.changeOpenPrice(openEvent);<a name="line.708"></a>
+<FONT color="green">709</FONT>                listener.changeHighPrice(highEvent);<a name="line.709"></a>
+<FONT color="green">710</FONT>                listener.changeLowPrice(lowEvent);<a name="line.710"></a>
+<FONT color="green">711</FONT>                listener.changeClosePrice(closeEvent);<a name="line.711"></a>
+<FONT color="green">712</FONT>                listener.changeOpenInterest(interestEvent);<a name="line.712"></a>
+<FONT color="green">713</FONT>                listener.changeVolume(volumeEvent);<a name="line.713"></a>
+<FONT color="green">714</FONT>            }<a name="line.714"></a>
+<FONT color="green">715</FONT>            lastFiredDate = null;<a name="line.715"></a>
+<FONT color="green">716</FONT>        }<a name="line.716"></a>
+<FONT color="green">717</FONT>    <a name="line.717"></a>
+<FONT color="green">718</FONT>        /**<a name="line.718"></a>
+<FONT color="green">719</FONT>         *  Fire all price information for a date to the given PriceListener.<a name="line.719"></a>
+<FONT color="green">720</FONT>         *<a name="line.720"></a>
+<FONT color="green">721</FONT>         *  @param  listener    the listener to fire the event to.<a name="line.721"></a>
+<FONT color="green">722</FONT>         *  @param  date        the date of prices to display<a name="line.722"></a>
+<FONT color="green">723</FONT>         */<a name="line.723"></a>
+<FONT color="green">724</FONT>        public void firePricesUpdated(PriceListener listener, java.util.Date date) {<a name="line.724"></a>
+<FONT color="green">725</FONT>            if (date != null) {<a name="line.725"></a>
+<FONT color="green">726</FONT>                firePricesUpdated(listener, getNearestPrices(date));<a name="line.726"></a>
+<FONT color="green">727</FONT>            }<a name="line.727"></a>
+<FONT color="green">728</FONT>        }<a name="line.728"></a>
+<FONT color="green">729</FONT>    <a name="line.729"></a>
+<FONT color="green">730</FONT>        /**<a name="line.730"></a>
+<FONT color="green">731</FONT>         *  Fire all price information to the given PriceListener.<a name="line.731"></a>
+<FONT color="green">732</FONT>         *<a name="line.732"></a>
+<FONT color="green">733</FONT>         *  @param  listener    the listener to fire the event to.<a name="line.733"></a>
+<FONT color="green">734</FONT>         *  @param  date        the date of prices to display<a name="line.734"></a>
+<FONT color="green">735</FONT>         */<a name="line.735"></a>
+<FONT color="green">736</FONT>        public void firePricesUpdated(PriceListener listener, Prices prices) {<a name="line.736"></a>
+<FONT color="green">737</FONT>            PriceEvent dateEvent    = new PriceEvent(this, prices.getDate(), prices.getDate());<a name="line.737"></a>
+<FONT color="green">738</FONT>            PriceEvent openEvent    = new PriceEvent(this, prices.getDate(), prices.getOpenObject());<a name="line.738"></a>
+<FONT color="green">739</FONT>            PriceEvent highEvent    = new PriceEvent(this, prices.getDate(), prices.getHighObject());<a name="line.739"></a>
+<FONT color="green">740</FONT>            PriceEvent lowEvent     = new PriceEvent(this, prices.getDate(), prices.getLowObject());<a name="line.740"></a>
+<FONT color="green">741</FONT>            PriceEvent closeEvent   = new PriceEvent(this, prices.getDate(), prices.getCloseObject());<a name="line.741"></a>
+<FONT color="green">742</FONT>            PriceEvent interestEvent = new PriceEvent(this, prices.getDate(), prices.getInterestObject());<a name="line.742"></a>
+<FONT color="green">743</FONT>            PriceEvent volumeEvent  = new PriceEvent(this, prices.getDate(), prices.getVolumeObject());<a name="line.743"></a>
+<FONT color="green">744</FONT>    <a name="line.744"></a>
+<FONT color="green">745</FONT>            listener.changeDate(dateEvent);<a name="line.745"></a>
+<FONT color="green">746</FONT>            listener.changeOpenPrice(openEvent);<a name="line.746"></a>
+<FONT color="green">747</FONT>            listener.changeHighPrice(highEvent);<a name="line.747"></a>
+<FONT color="green">748</FONT>            listener.changeLowPrice(lowEvent);<a name="line.748"></a>
+<FONT color="green">749</FONT>            listener.changeClosePrice(closeEvent);<a name="line.749"></a>
+<FONT color="green">750</FONT>            listener.changeOpenInterest(interestEvent);<a name="line.750"></a>
+<FONT color="green">751</FONT>            listener.changeVolume(volumeEvent);<a name="line.751"></a>
+<FONT color="green">752</FONT>        }<a name="line.752"></a>
+<FONT color="green">753</FONT>    <a name="line.753"></a>
+<FONT color="green">754</FONT>    /* *************************************** */<a name="line.754"></a>
+<FONT color="green">755</FONT>    /* *** STATIC METHODS                  *** */<a name="line.755"></a>
+<FONT color="green">756</FONT>    /* *************************************** */<a name="line.756"></a>
+<FONT color="green">757</FONT>        /**<a name="line.757"></a>
+<FONT color="green">758</FONT>         *  Converts a formatted month in the format of 'MMM YY' to a month formatted<a name="line.758"></a>
+<FONT color="green">759</FONT>         *  for a key in the format 'YYYYM'.<a name="line.759"></a>
+<FONT color="green">760</FONT>         *<a name="line.760"></a>
+<FONT color="green">761</FONT>         *  @param  formattedMonth  month in 'MMM YY'<a name="line.761"></a>
+<FONT color="green">762</FONT>         *  @return                 month in 'YYYYM'<a name="line.762"></a>
+<FONT color="green">763</FONT>         */<a name="line.763"></a>
+<FONT color="green">764</FONT>        public static String convertFormattedMonthToKey(String formattedMonth) {<a name="line.764"></a>
+<FONT color="green">765</FONT>            StringBuffer formatted = new StringBuffer(formattedMonth);<a name="line.765"></a>
+<FONT color="green">766</FONT>            StringBuffer key = new StringBuffer();<a name="line.766"></a>
+<FONT color="green">767</FONT>    <a name="line.767"></a>
+<FONT color="green">768</FONT>            key.append("20");<a name="line.768"></a>
+<FONT color="green">769</FONT>            key.append(formatted.substring(formatted.length() - 2));<a name="line.769"></a>
+<FONT color="green">770</FONT>            key.append(Month.byAbbrev(formatted.substring(0, 3)).getSymbol());<a name="line.770"></a>
+<FONT color="green">771</FONT>            return key.toString();<a name="line.771"></a>
+<FONT color="green">772</FONT>        }<a name="line.772"></a>
+<FONT color="green">773</FONT>    <a name="line.773"></a>
+<FONT color="green">774</FONT>        /**<a name="line.774"></a>
+<FONT color="green">775</FONT>         *  Get the currently selected contract.  This is for those cases where<a name="line.775"></a>
+<FONT color="green">776</FONT>         *  a listener is not adequate.<a name="line.776"></a>
+<FONT color="green">777</FONT>         *<a name="line.777"></a>
+<FONT color="green">778</FONT>         *  @return     the currently selected contract<a name="line.778"></a>
+<FONT color="green">779</FONT>         */<a name="line.779"></a>
+<FONT color="green">780</FONT>        public static Contract getSelectedContract() throws ContractNotSelectedException {<a name="line.780"></a>
+<FONT color="green">781</FONT>            if (selectedContract == null) {<a name="line.781"></a>
+<FONT color="green">782</FONT>                throw new ContractNotSelectedException("No contract is currently selected");<a name="line.782"></a>
+<FONT color="green">783</FONT>            }<a name="line.783"></a>
+<FONT color="green">784</FONT>            return selectedContract;<a name="line.784"></a>
+<FONT color="green">785</FONT>        }<a name="line.785"></a>
+<FONT color="green">786</FONT>    <a name="line.786"></a>
+<FONT color="green">787</FONT>    /* ***---------------------------------*** */<a name="line.787"></a>
+<FONT color="green">788</FONT>    /* *** EVENT LISTENER METHODS          *** */<a name="line.788"></a>
+<FONT color="green">789</FONT>    /* ***---------------------------------*** */<a name="line.789"></a>
+<FONT color="green">790</FONT>        /**<a name="line.790"></a>
+<FONT color="green">791</FONT>         *  Add a listener for selecting a contract.<a name="line.791"></a>
+<FONT color="green">792</FONT>         *<a name="line.792"></a>
+<FONT color="green">793</FONT>         *  @param  listener    a ContractSelectionListener<a name="line.793"></a>
+<FONT color="green">794</FONT>         */<a name="line.794"></a>
+<FONT color="green">795</FONT>        public static void addSelectionListener(ContractSelectionListener listener) {<a name="line.795"></a>
+<FONT color="green">796</FONT>            selectionListeners.add(listener);<a name="line.796"></a>
+<FONT color="green">797</FONT>        }<a name="line.797"></a>
+<FONT color="green">798</FONT>    <a name="line.798"></a>
+<FONT color="green">799</FONT>        /**<a name="line.799"></a>
+<FONT color="green">800</FONT>         *  Remove a listener from selecting a contract.<a name="line.800"></a>
+<FONT color="green">801</FONT>         *<a name="line.801"></a>
+<FONT color="green">802</FONT>         *  @param  listener    a ContractSelectionListener<a name="line.802"></a>
+<FONT color="green">803</FONT>         */<a name="line.803"></a>
+<FONT color="green">804</FONT>        public static void removeSelectionListener(ContractSelectionListener listener) {<a name="line.804"></a>
+<FONT color="green">805</FONT>            selectionListeners.remove(listener);<a name="line.805"></a>
+<FONT color="green">806</FONT>        }<a name="line.806"></a>
+<FONT color="green">807</FONT>    <a name="line.807"></a>
+<FONT color="green">808</FONT>        /**<a name="line.808"></a>
+<FONT color="green">809</FONT>         *  Clear all listeners for selecting a contract.<a name="line.809"></a>
+<FONT color="green">810</FONT>         */<a name="line.810"></a>
+<FONT color="green">811</FONT>        public static void clearSelectionListeners() {<a name="line.811"></a>
+<FONT color="green">812</FONT>            selectionListeners.clear();<a name="line.812"></a>
+<FONT color="green">813</FONT>        }<a name="line.813"></a>
+<FONT color="green">814</FONT>    <a name="line.814"></a>
+<FONT color="green">815</FONT>        /**<a name="line.815"></a>
+<FONT color="green">816</FONT>         *  Fire a contract selection change.<a name="line.816"></a>
+<FONT color="green">817</FONT>         *<a name="line.817"></a>
+<FONT color="green">818</FONT>         *  @param  prices  the prices to display<a name="line.818"></a>
+<FONT color="green">819</FONT>         */<a name="line.819"></a>
+<FONT color="green">820</FONT>        public static void fireSelectionUpdated() {<a name="line.820"></a>
+<FONT color="green">821</FONT>            ContractSelectionEvent event = new ContractSelectionEvent(selectedContract);<a name="line.821"></a>
+<FONT color="green">822</FONT>    <a name="line.822"></a>
+<FONT color="green">823</FONT>            Iterator it = selectionListeners.iterator();<a name="line.823"></a>
+<FONT color="green">824</FONT>            while (it.hasNext()) {<a name="line.824"></a>
+<FONT color="green">825</FONT>                ContractSelectionListener listener = (ContractSelectionListener)it.next();<a name="line.825"></a>
+<FONT color="green">826</FONT>                listener.selectContract(event);<a name="line.826"></a>
+<FONT color="green">827</FONT>            }<a name="line.827"></a>
+<FONT color="green">828</FONT>        }<a name="line.828"></a>
+<FONT color="green">829</FONT>    }<a name="line.829"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

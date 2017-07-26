@@ -1,0 +1,12 @@
+prototype.commodities
+prototype.commodities.contract
+prototype.commodities.dataaccess
+prototype.commodities.dataaccess.database
+prototype.commodities.dataaccess.dataloader
+prototype.commodities.dataaccess.pool
+prototype.commodities.graph
+prototype.commodities.menu
+prototype.commodities.price
+prototype.commodities.simulator
+prototype.commodities.tests
+prototype.commodities.util
