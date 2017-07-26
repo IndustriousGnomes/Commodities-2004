@@ -1,0 +1,1 @@
+This is the original 2004 Commodities program tha was my Master's Capstone project.  This application is for training purposes only and should not be used for commercial use.  The owner accepts no responsibility of any loss due to the inapropriate used of the application.
